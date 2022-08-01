@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: eventstore-db
+  name: eventstore-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: eventstore-db
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f ../docker-compose.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/eventstore: "true"
+        io.kompose.service: eventstore-db
+    spec:
+      containers:
+        - env:
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: admin123
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: admin
+          image: mongo
+          name: microservices-eventstore-db
+          resources: {}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+status: {}
