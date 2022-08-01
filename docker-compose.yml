@@ -1,0 +1,137 @@
+version: '3'
+
+networks:
+  global:
+  eventstore:
+  user:
+  elasticsearch:
+
+services:
+
+  fluentd:
+    container_name: fluentd
+    build: .
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    networks:
+      - global
+      - elasticsearch
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.1
+    container_name: elasticsearch
+    environment:
+      - "discovery.type=single-node"
+    ports:
+      - "9200:9200"
+    networks:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.13.1
+    networks:
+      - "elasticsearch"
+    ports:
+      - "5601:5601"
+
+  # rabbitmq:
+  #   container_name: microservices-rabbitmq
+  #   image: rabbitmq
+  #   restart: unless-stopped
+  #   networks:
+  #     - global
+
+  eventstore:
+    container_name: microservices-eventstore
+    image: acim/go-reflex
+    volumes:
+      - ./eventstore:/app
+    environment:
+      - RACE_DETECTOR=1
+    ports:
+      - "50011:5011"
+    depends_on:
+      - rabbitmq
+      - eventstore_DB
+    networks:
+      - eventstore
+      - global
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-async-connect: 'true'
+        fluentd-address: localhost:24224
+        tag: service.event
+
+  eventstore_DB:
+    container_name: microservices-eventstore_DB
+    image: mongo
+    restart: unless-stopped
+    stop_grace_period: 30s
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-async-connect: 'true'
+        fluentd-address: localhost:24224
+        tag: service.event.db
+    networks:
+      - eventstore
+
+  # user: 
+  #   container_name: microservices-user
+  #   image: acim/go-reflex
+  #   ports:
+  #     - "50010:50010"
+  #   environment:
+  #     - RACE_DETECTOR=1
+  #   depends_on:
+  #     - user_write_DB
+  #   volumes:
+  #     - ./user:/app
+  #   logging:
+  #     driver: "fluentd"
+  #     options:
+  #       fluentd-async-connect: 'true'
+  #       fluentd-address: localhost:24224
+  #       tag: service.user
+  #   networks:
+  #     - user
+  #     - global
+  
+  # user_write_DB:
+  #   container_name: microservices-user_write_DB
+  #   image: mariadb
+  #   restart: unless-stopped
+  #   environment:
+  #     - MARIADB_DATABASE=user
+  #     - MARIADB_USER=admin
+  #     - MARIADB_PASSWORD=admin123
+  #     - MARIADB_ROOT_PASSWORD=admin123
+  #   logging:
+  #     driver: "fluentd"
+  #     options:
+  #       fluentd-async-connect: 'true'
+  #       fluentd-address: localhost:24224
+  #       tag: service.user.write_DB
+  #   networks:
+  #     - user
+
+  # user_read_DB:
+  #   container_name: microservices-user_read_DB
+  #   image: cockroachdb/cockroach
+  #   restart: unless-stopped
+  #   command: start-single-node --insecure
+  #   logging:
+  #     driver: "fluentd"
+  #     options:
+  #       fluentd-async-connect: 'true'
+  #       fluentd-address: localhost:24224
+  #       tag: service.user.read_DB    
+  #   networks:
+  #     - user
