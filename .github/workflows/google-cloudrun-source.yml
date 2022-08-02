@@ -52,9 +52,9 @@ on:
       - "dev"
 
 env:
-  PROJECT_ID: first-golang-project # TODO: update Google Cloud project id
-  SERVICE: nest-cloud-run # TODO: update Cloud Run service name
-  REGION: europe-central2 # TODO: update Cloud Run service region
+  PROJECT_ID: first-golang-project 
+  SERVICE: go-microservices 
+  REGION: europe-central2 
 
 jobs:
   deploy:
