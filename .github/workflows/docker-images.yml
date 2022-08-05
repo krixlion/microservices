@@ -18,14 +18,14 @@ jobs:
     - name: Docker login
       run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD}}
     
-    - name: Build the Users docker image
-      run: docker build ./dockerfiles --file user-dockerfile --tag ${{ secrets.DOCKER_USER }}/user-service
+    - name: Build the User docker image
+      run: docker build ./user --tag ${{ secrets.DOCKER_USER }}/user-service
       
     - name: Build the Eventstore docker image
-      run: docker build ./dockerfiles --file eventstore-dockerfile --tag ${{ secrets.DOCKER_USER }}/eventstore-service
+      run: docker build ./eventstore --tag ${{ secrets.DOCKER_USER }}/eventstore-service
       
     - name: Build the fluentd docker image
-      run: docker build ./dockerfiles --file fluentd-dockerfile --tag ${{ secrets.DOCKER_USER }}/fluentd
+      run: docker build ./fluentd --tag ${{ secrets.DOCKER_USER }}/fluentd
     
     - name: Docker push
       run: |
