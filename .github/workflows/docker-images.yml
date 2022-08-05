@@ -1,0 +1,35 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Docker login
+      run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD}}
+    
+    - name: Build the Users docker image
+      run: docker build ./dockerfiles --file user-dockerfile --tag ${{ secrets.DOCKER_USER }}/user-service
+      
+    - name: Build the Eventstore docker image
+      run: docker build ./dockerfiles --file eventstore-dockerfile --tag ${{ secrets.DOCKER_USER }}/eventstore-service
+      
+    - name: Build the fluentd docker image
+      run: docker build ./dockerfiles --file fluentd-dockerfile --tag ${{ secrets.DOCKER_USER }}/fluentd
+    
+    - name: Docker push
+      run: |
+        docker push ${{ secrets.DOCKER_USER }}/eventstore-service
+        docker push ${{ secrets.DOCKER_USER }}/user-service
+        docker push ${{ secrets.DOCKER_USER }}/fluentd
+      
