@@ -13,4 +13,4 @@ RUN go mod tidy
 RUN go mod vendor
 RUN go build cmd/main.go
 EXPOSE 50051
-CMD [ "main" ]
+CMD [ "./main" ]
