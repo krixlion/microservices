@@ -36,14 +36,13 @@ services:
       - "elasticsearch"
     ports:
       - "5601:5601"
-    labels:
-      kompose.service.type: LoadBalancer
-  # rabbitmq:
-  #   container_name: microservices-rabbitmq
-  #   image: rabbitmq
-  #   restart: unless-stopped
-  #   networks:
-  #     - global
+
+  rabbitmq:
+    container_name: microservices-rabbitmq
+    image: rabbitmq
+    restart: unless-stopped
+    networks:
+      - global
 
   eventstore:
     container_name: microservices-eventstore
@@ -84,55 +83,55 @@ services:
     networks:
       - eventstore
 
-  # user: 
-  #   container_name: microservices-user
-  #   image: acim/go-reflex
-  #   ports:
-  #     - "50010:50010"
-  #   environment:
-  #     - RACE_DETECTOR=1
-  #   depends_on:
-  #     - user_write_DB
-  #   volumes:
-  #     - ./user:/app
-  #   logging:
-  #     driver: "fluentd"
-  #     options:
-  #       fluentd-async-connect: 'true'
-  #       fluentd-address: localhost:24224
-  #       tag: service.user
-  #   networks:
-  #     - user
-  #     - global
+  user: 
+    container_name: microservices-user
+    image: acim/go-reflex
+    ports:
+      - "50010:50010"
+    environment:
+      - RACE_DETECTOR=1
+    depends_on:
+      - user_write_DB
+    volumes:
+      - ./user:/app
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-async-connect: 'true'
+        fluentd-address: localhost:24224
+        tag: service.user
+    networks:
+      - user
+      - global
   
-  # user_write_DB:
-  #   container_name: microservices-user_write_DB
-  #   image: mariadb
-  #   restart: unless-stopped
-  #   environment:
-  #     - MARIADB_DATABASE=user
-  #     - MARIADB_USER=admin
-  #     - MARIADB_PASSWORD=admin123
-  #     - MARIADB_ROOT_PASSWORD=admin123
-  #   logging:
-  #     driver: "fluentd"
-  #     options:
-  #       fluentd-async-connect: 'true'
-  #       fluentd-address: localhost:24224
-  #       tag: service.user.write_DB
-  #   networks:
-  #     - user
+  user_write_DB:
+    container_name: microservices-user_write_DB
+    image: mariadb
+    restart: unless-stopped
+    environment:
+      - MARIADB_DATABASE=user
+      - MARIADB_USER=admin
+      - MARIADB_PASSWORD=admin123
+      - MARIADB_ROOT_PASSWORD=admin123
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-async-connect: 'true'
+        fluentd-address: localhost:24224
+        tag: service.user.write_DB
+    networks:
+      - user
 
-  # user_read_DB:
-  #   container_name: microservices-user_read_DB
-  #   image: cockroachdb/cockroach
-  #   restart: unless-stopped
-  #   command: start-single-node --insecure
-  #   logging:
-  #     driver: "fluentd"
-  #     options:
-  #       fluentd-async-connect: 'true'
-  #       fluentd-address: localhost:24224
-  #       tag: service.user.read_DB    
-  #   networks:
-  #     - user
+  user_read_DB:
+    container_name: microservices-user_read_DB
+    image: cockroachdb/cockroach
+    restart: unless-stopped
+    command: start-single-node --insecure
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-async-connect: 'true'
+        fluentd-address: localhost:24224
+        tag: service.user.read_DB    
+    networks:
+      - user
