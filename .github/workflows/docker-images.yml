@@ -27,21 +27,21 @@ jobs:
     - name: Build and push user service
       uses: docker/build-push-action@v3
       with:
-        context: ./user/
+        context: ./user
         push: true
         tags: krixlion/user-service:latest
     
     - name: Build and push eventstore service
       uses: docker/build-push-action@v3
       with:
-        context: ./eventstore/
+        context: ./eventstore
         push: true
         tags: krixlion/eventstore-service:latest
 
     - name: Build and push fluentd 
       uses: docker/build-push-action@v3
       with:
-        context: ./fluentd/
+        context: ./fluentd
         push: true
         tags: krixlion/fluentd:latest
 
