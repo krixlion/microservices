@@ -2,12 +2,12 @@ FROM golang:1.19
 
 ENV GO111MODULE=on
 ENV GOFLAGS=-mod=vendor
-ENV APP_HOME /go/src/eventstore
+ENV APP_HOME /go/src/user
 
 RUN mkdir -p "$APP_HOME"
 WORKDIR "$APP_HOME"
 
-ADD ../eventstore/* .
+ADD . .
 
 RUN go mod tidy
 RUN go mod vendor
