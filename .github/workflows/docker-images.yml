@@ -17,19 +17,26 @@ jobs:
     
     - name: Docker login
       run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD}}
-    
-    - name: Build the User docker image
-      run: docker build ./user --tag ${{ secrets.DOCKER_USER }}/user-service
       
-    - name: Build the Eventstore docker image
-      run: docker build ./eventstore --tag ${{ secrets.DOCKER_USER }}/eventstore-service
-      
-    - name: Build the fluentd docker image
-      run: docker build ./fluentd --tag ${{ secrets.DOCKER_USER }}/fluentd
+    - name: Build and push user service
+      uses: docker/build-push-action@v3
+      with:
+        context: ./user/
+        push: true
+        tags: krixlion/user-service:latest
     
-    - name: Docker push
-      run: |
-        docker push ${{ secrets.DOCKER_USER }}/eventstore-service
-        docker push ${{ secrets.DOCKER_USER }}/user-service
-        docker push ${{ secrets.DOCKER_USER }}/fluentd
+    - name: Build and push eventstore service
+      uses: docker/build-push-action@v3
+      with:
+        context: ./eventstore/
+        push: true
+        tags: krixlion/eventstore-service:latest
+
+    - name: Build and push fluentd 
+      uses: docker/build-push-action@v3
+      with:
+        context: ./fluentd/
+        push: true
+        tags: krixlion/fluentd:latest
+
       
