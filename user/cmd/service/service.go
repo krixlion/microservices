@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
-	"log"
 	"net"
+	"os"
 	"user/pkg/grpc/pb"
+
+	"github.com/go-kit/log"
 
 	"google.golang.org/grpc"
 )
@@ -12,6 +14,8 @@ import (
 const (
 	port = ":50051"
 )
+
+var logger log.Logger
 
 type UserHandler struct {
 	pb.UnimplementedUserServer
@@ -37,12 +41,16 @@ func (s *UserHandler) Create(_ context.Context, _ *pb.UserRequest) (*pb.UserResp
 }
 
 func Run() {
+	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
+
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		logger.Log("failed to listen: %v", err)
 	}
 	// Creates a new gRPC server
 	s := grpc.NewServer()
 	pb.RegisterUserServer(s, &UserHandler{})
+	logger.Log("msg", "Listening", "transport", "gRPC", "port", port)
 	s.Serve(lis)
 }
