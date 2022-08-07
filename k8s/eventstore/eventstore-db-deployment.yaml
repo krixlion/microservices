@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: eventstore-db
+  name: eventstore-db
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      service: eventstore-db
+  strategy: 
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        network/eventstore: "true"
+        service: eventstore-db
+    spec:
+      containers:
+        - env:
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: admin123
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: admin
+          image: mongo
+          name: microservices-eventstore-db
+          volumeMounts:
+            - name: eventstore-db-data
+              mountPath: /var/lib/pgdata
+          resources: 
+            requests:
+              storage: 1Gi
+            limits:
+              memory: 100Mi
+              cpu: 10m
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+    volumes:
+      - name: eventstore-db-data
+        persistentVolumeClaim:
+          claimName: eventstore-db-claim
+status: {}
