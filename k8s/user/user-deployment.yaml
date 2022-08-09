@@ -18,23 +18,15 @@ spec:
         service: user
     spec:
       containers:
-        - image: krixlion/user:latest
+        - image: krixlion/user-service:latest
           name: user
           ports:
-            - containerPort: 5011
-          resources: 
-            requests:
-              memory: 100Mi
-              cpu: 100m
-            limits:
-              memory: 200Mi
-              cpu: 200mm
-          volumeMounts:
-            - mountPath: /app
-              name: user-claim0
+            - containerPort: 50011
+          # resources: 
+          #   requests:
+          #     memory: 100Mi
+          #     cpu: 100m
+          #   limits:
+          #     memory: 200Mi
+          #     cpu: 200mm
       restartPolicy: Always
-      volumes:
-        - name: user-claim0
-          persistentVolumeClaim:
-            claimName: user-claim0
-status: {}

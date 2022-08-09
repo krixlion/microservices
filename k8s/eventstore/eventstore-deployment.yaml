@@ -21,20 +21,12 @@ spec:
         - image: krixlion/eventstore:latest
           name: eventstore
           ports:
-            - containerPort: 5011
-          resources: 
-            requests:
-              memory: 100Mi
-              cpu: 100m
-            limits:
-              memory: 200Mi
-              cpu: 200mm
-          volumeMounts:
-            - mountPath: /app
-              name: eventstore-claim0
+            - containerPort: 50011
+          # resources: 
+          #   requests:
+          #     memory: 100Mi
+          #     cpu: 100m
+          #   limits:
+          #     memory: 200Mi
+          #     cpu: 200mm
       restartPolicy: Always
-      volumes:
-        - name: eventstore-claim0
-          persistentVolumeClaim:
-            claimName: eventstore-claim0
-status: {}

@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    service: user-db
+  # labels:
+    # service: user-db
   name: user-db
 spec:
   replicas: 3
@@ -27,17 +27,16 @@ spec:
           name: microservices-user-db
           volumeMounts:
             - name: user-db-data
-              mountPath: /var/lib/pgdata
-          resources: 
-            requests:
-              storage: 1Gi
-            limits:
-              memory: 100Mi
-              cpu: 10m
+              mountPath: /data/db
+          # resources: 
+          #   requests:
+          #     storage: 10Gi
+            # limits:
+            #   memory: 3Gi
+            #   cpu: 100mm
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
-    volumes:
-      - name: user-db-data
-        persistentVolumeClaim:
-          claimName: user-db-claim
-status: {}
+      volumes:
+        - name: user-db-data
+          persistentVolumeClaim:
+            claimName: user-db-claim
