@@ -33,8 +33,8 @@ func Run() {
 
 	pb.RegisterEventStoreServer(grpcServer, server)
 
-	err = grpcServer.Serve(lis)
 	logger.Log("transport", "net/tcp", "msg", "listening")
+	err = grpcServer.Serve(lis)
 	if err != nil {
 		logger.Log("transport", "grpc", "msg", "failed serving", "err", err)
 	}
