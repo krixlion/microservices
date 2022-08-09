@@ -28,5 +28,5 @@ jobs:
       with:
         context: ./user
         push: true
-        tags: krixlion/user-service:latest
+        tags: ${{ secrets.DOCKER_USER }}/user-service:latest
     
