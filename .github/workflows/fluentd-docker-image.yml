@@ -28,6 +28,6 @@ jobs:
       with:
         context: ./fluentd
         push: true
-        tags: krixlion/fluentd:latest
+        tags: ${{ secrets.DOCKER_USER }}/fluentd:latest
 
       
