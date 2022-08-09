@@ -34,9 +34,7 @@ services:
     image: docker.elastic.co/kibana/kibana:7.13.1
     networks:
       - "elasticsearch"
-    ports:
-      - "5601:5601"
-
+      
   rabbitmq:
     container_name: microservices-rabbitmq
     image: rabbitmq
@@ -51,8 +49,6 @@ services:
       - ./eventstore:/app
     environment:
       - RACE_DETECTOR=1
-    ports:
-      - "50011:5011"
     depends_on:
       - rabbitmq
       - eventstore_DB
@@ -86,8 +82,6 @@ services:
   user: 
     container_name: microservices-user
     image: acim/go-reflex
-    ports:
-      - "50010:50010"
     environment:
       - RACE_DETECTOR=1
     depends_on:
