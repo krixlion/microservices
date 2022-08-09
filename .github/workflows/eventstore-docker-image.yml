@@ -29,6 +29,6 @@ jobs:
       with:
         context: ./eventstore
         push: true
-        tags: krixlion/eventstore-service:latest
+        tags: ${{ secrets.DOCKER_USER }}/eventstore:latest
 
 
