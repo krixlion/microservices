@@ -24,9 +24,9 @@ spec:
             - containerPort: 50011
           # resources: 
           #   requests:
-          #     memory: 100Mi
+          #     memory: 100
           #     cpu: 100m
           #   limits:
-          #     memory: 200Mi
+          #     memory: 200
           #     cpu: 200mm
       restartPolicy: Always

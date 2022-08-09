@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  # labels:
-    # service: user-db
+  labels:
+    service: user-db
   name: user-db
 spec:
   replicas: 3
@@ -31,9 +31,9 @@ spec:
           # resources: 
           #   requests:
           #     storage: 10Gi
-            # limits:
-            #   memory: 3Gi
-            #   cpu: 100mm
+          #   limits:
+          #     memory: 3
+          #     cpu: 100mm
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:

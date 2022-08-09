@@ -23,7 +23,6 @@ func Run() {
 
 	flag.Parse()
 	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
-	logger.Log("transport", "net/tcp", "msg", "listening")
 	if err != nil {
 		logger.Log("transport", "net/tcp", "msg", "failed listening", "err", err)
 	}

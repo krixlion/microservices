@@ -30,9 +30,9 @@ spec:
               mountPath: /data/db
           # resources: 
           #   requests:
-          #     storage: 10Gi
+          #     storage: 100m
           #   limits:
-          #     memory: 100Mi
+          #     memory: 100
           #     cpu: 100m
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
