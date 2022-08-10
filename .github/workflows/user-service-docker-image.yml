@@ -1,5 +1,6 @@
 name: User service Docker Image CI
 on:
+  workflow_dispatch:
   push:
     paths:
     - 'user/**'
