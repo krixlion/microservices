@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    service: user-db
+    service: user-db-service
   name: user-db
 spec:
   replicas: 1

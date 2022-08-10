@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    service: user
+    service: user-service
   name: user
 spec:
   replicas: 3
@@ -21,7 +21,7 @@ spec:
         - image: krixlion/user-service:latest
           name: user
           ports:
-            - containerPort: 50011
+            - containerPort: 50051
           # resources: 
           #   requests:
           #     memory: 100

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    service: eventstore
+    service: eventstore-service
   name: eventstore
 spec:
   replicas: 3
@@ -22,7 +22,6 @@ spec:
           name: eventstore
           ports:
             - containerPort: 50011
-            - containerPort: 5170
           # resources: 
           #   requests:
           #     memory: 100
