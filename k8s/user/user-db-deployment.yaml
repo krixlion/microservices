@@ -5,7 +5,7 @@ metadata:
     service: user-db
   name: user-db
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       service: user-db

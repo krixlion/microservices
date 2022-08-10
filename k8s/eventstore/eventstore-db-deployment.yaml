@@ -5,7 +5,7 @@ metadata:
     service: eventstore-db
   name: eventstore-db
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       service: eventstore-db
@@ -40,4 +40,3 @@ spec:
         - name: eventstore-db-data
           persistentVolumeClaim:
             claimName: eventstore-db-claim
-status: {}

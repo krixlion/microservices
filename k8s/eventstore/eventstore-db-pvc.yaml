@@ -2,9 +2,10 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    service: user-claim
-  name: user-db-claim
+    service: eventstore-claim
+  name: eventstore-db-claim
 spec:
+  storageClassName: standard
   accessModes:
     - ReadWriteOnce
   resources:
