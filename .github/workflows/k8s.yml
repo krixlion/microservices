@@ -1,0 +1,27 @@
+name: CI
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      - name: Apply k8s manifests
+        run: |
+          gcloud init --console-only
+          gcloud components install kubectl
+          gcloud components install gke-gcloud-auth-plugin
+          gcloud container clusters get-credentials ${{ secrets.CLUSTER_NAME }}
+          kubectl apply -f k8s/user
+          kubectl apply -f k8s/eventstore
+          
+
+
