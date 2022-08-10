@@ -1,4 +1,4 @@
-name: CI
+name: GKE CD
 on:
   push:
     branches: [ "dev" ]
