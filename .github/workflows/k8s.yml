@@ -23,7 +23,7 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v0'
 
-      - name: 'Applu k8s manifests'
+      - name: 'Apply k8s manifests'
         run: |
           kubectl apply -f k8s/user
           kubectl apply -f k8s/eventstore
