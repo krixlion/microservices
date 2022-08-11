@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"os"
 	"user/pkg/grpc/pb"
@@ -30,6 +31,7 @@ func (s *UserHandler) Index(_ *pb.UserFilter, stream pb.User_IndexServer) error 
 		Phone: "phone lol",
 	})
 	logger.Log("msg", "Access index method", "transport", "gRPC", "port", port)
+	fmt.Println("msg", "Access index method", "transport", "gRPC", "port", port)
 	if err != nil {
 		return err
 	}
