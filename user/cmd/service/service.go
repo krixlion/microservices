@@ -30,6 +30,8 @@ func (s *UserHandler) Index(_ *pb.UserFilter, stream pb.User_IndexServer) error 
 		Email: "email",
 		Phone: "phone lol",
 	})
+	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
 	logger.Log("msg", "Access index method", "transport", "gRPC", "port", port)
 	fmt.Println("msg", "Access index method", "transport", "gRPC", "port", port)
 	if err != nil {
