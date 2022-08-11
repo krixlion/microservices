@@ -4,6 +4,7 @@ metadata:
   name: user-service
 spec:
   selector:
-    name: user
+    service: user
+  type: "LoadBalancer"
   ports:
       - port: 50051

@@ -29,6 +29,7 @@ func (s *UserHandler) Index(_ *pb.UserFilter, stream pb.User_IndexServer) error 
 		Email: "email",
 		Phone: "phone lol",
 	})
+	logger.Log("msg", "Access index method", "transport", "gRPC", "port", port)
 	if err != nil {
 		return err
 	}
