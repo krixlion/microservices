@@ -25,7 +25,7 @@ jobs:
 
       - name: 'Apply k8s manifests'
         run: |
-          gcloud container clusters get-credentials ${{ secrets.CLUSTER_NAME }}
+          gcloud container clusters get-credentials ${{ secrets.CLUSTER_NAME }} --zone europe-central2-a
           kubectl apply -f k8s/user
           kubectl apply -f k8s/eventstore
 
