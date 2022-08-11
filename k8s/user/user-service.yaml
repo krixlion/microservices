@@ -5,6 +5,5 @@ metadata:
 spec:
   selector:
     service: user
-  type: "LoadBalancer"
   ports:
       - port: 50051

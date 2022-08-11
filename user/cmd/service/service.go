@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"os"
 	"user/pkg/grpc/pb"
@@ -30,10 +29,8 @@ func (s *UserHandler) Index(_ *pb.UserFilter, stream pb.User_IndexServer) error 
 		Email: "email",
 		Phone: "phone lol",
 	})
-	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
+	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
-	logger.Log("msg", "Access index method", "transport", "gRPC", "port", port)
-	fmt.Println("msg", "Access index method", "transport", "gRPC", "port", port)
 	if err != nil {
 		return err
 	}
@@ -42,6 +39,10 @@ func (s *UserHandler) Index(_ *pb.UserFilter, stream pb.User_IndexServer) error 
 
 // Create a new User - A simple RPC
 func (s *UserHandler) Create(_ context.Context, _ *pb.UserRequest) (*pb.UserResponse, error) {
+	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
+
+	logger.Log("msg", "Create method", "transport", "gRPC", "port", port)
 	panic("not implemented") // TODO: Implement
 }
 
