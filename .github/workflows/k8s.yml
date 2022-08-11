@@ -16,14 +16,16 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       
-      - name: Apply k8s manifests
+      - uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
+
+      - name: 'Applu k8s manifests'
         run: |
-          gcloud init --console-only
-          gcloud components install kubectl
-          gcloud components install gke-gcloud-auth-plugin
-          gcloud container clusters get-credentials ${{ secrets.CLUSTER_NAME }}
           kubectl apply -f k8s/user
           kubectl apply -f k8s/eventstore
-          
 
 
