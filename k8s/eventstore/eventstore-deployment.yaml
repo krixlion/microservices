@@ -22,11 +22,11 @@ spec:
           name: eventstore
           ports:
             - containerPort: 50011
-          # resources: 
-          #   requests:
-          #     memory: 100
-          #     cpu: 100m
-          #   limits:
-          #     memory: 200
-          #     cpu: 200mm
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512M
+            limits:
+              cpu: 500m
+              memory: 1Gi
       restartPolicy: Always

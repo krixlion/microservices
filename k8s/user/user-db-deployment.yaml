@@ -28,12 +28,13 @@ spec:
           volumeMounts:
             - name: user-db-data
               mountPath: /data/db
-          # resources: 
-          #   requests:
-          #     storage: 10Gi
-          #   limits:
-          #     memory: 3
-          #     cpu: 100mm
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512M
+            limits:
+              cpu: 500m
+              memory: 1Gi
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
