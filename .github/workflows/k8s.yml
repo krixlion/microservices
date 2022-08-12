@@ -22,12 +22,11 @@ jobs:
 
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v0'
-
-      - name: 'Apply k8s manifests'
         run: |
           gcloud components install gke-gcloud-auth-plugin
           gcloud container clusters get-credentials ${{ secrets.CLUSTER_NAME }} --zone europe-central2-a
+          
+      - name: 'Apply k8s manifests'
+        run: |
           kubectl apply -f k8s/user
           kubectl apply -f k8s/eventstore
-
-
