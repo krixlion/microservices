@@ -22,6 +22,8 @@ jobs:
 
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v0'
+        
+      - name: 'Access GKE cluster'
         run: |
           gcloud components install gke-gcloud-auth-plugin
           gcloud container clusters get-credentials ${{ secrets.CLUSTER_NAME }} --zone europe-central2-a
