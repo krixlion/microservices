@@ -30,12 +30,12 @@ spec:
             - name: eventstore-db-data
               mountPath: /data/db
           resources:
-            requests:
-              cpu: 200m
-              memory: 512M
+            # requests:
+            #   cpu: 200m
+            #   memory: 512M
             limits:
-              cpu: 500m
-              memory: 1Gi
+              cpu: 500M
+              memory: 3Gi
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
