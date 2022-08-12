@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: dev
   labels:
     service: eventstore-claim
   name: eventstore-db-claim

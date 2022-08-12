@@ -13,6 +13,7 @@ spec:
     type: Recreate
   template:
     metadata:
+      namespace: dev
       labels:
         network/eventstore: "true"
         service: eventstore
