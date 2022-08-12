@@ -24,10 +24,10 @@ spec:
           ports:
             - containerPort: 50051
           resources:
-            requests:
-              cpu: 200m
-              memory: 512M
+            # requests:
+            #   cpu: 200m
+            #   memory: 512M
             limits:
-              cpu: 500m
-              memory: 1Gi
+              cpu: 500M
+              memory: 3Gi
       restartPolicy: Always
