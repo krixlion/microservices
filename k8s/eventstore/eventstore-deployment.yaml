@@ -15,15 +15,15 @@ spec:
   template:
     metadata:
       labels:
-        network/eventstore: "true"
         service: eventstore
     spec:
       containers:
         - image: krixlion/eventstore:latest
           name: eventstore
           ports:
-            - containerPort: 50011
-          resources:
+            - containerPort: 50051
+              name: grpc
+          # resources:
             # requests:
             #   cpu: 200m
             #   memory: 512M

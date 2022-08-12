@@ -15,7 +15,6 @@ spec:
   template:
     metadata:
       labels:
-        network/user: "true"
         service: user-db
     spec:
       containers:
@@ -29,7 +28,9 @@ spec:
           volumeMounts:
             - name: user-db-data
               mountPath: /data/db
-          resources:
+          ports:
+            - containerPort: 27017
+          # resources:
             # requests:
             #   cpu: 200m
             #   memory: 512M

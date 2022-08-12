@@ -15,7 +15,6 @@ spec:
   template:
     metadata:
       labels:
-        network/eventstore: "true"
         service: eventstore-db
     spec:
       containers:
@@ -25,11 +24,14 @@ spec:
             - name: MONGO_INITDB_ROOT_USERNAME
               value: admin
           image: mongo
+          ports:
+            - containerPort: 27017
+              protocol: TCP
           name: microservices-eventstore-db
           volumeMounts:
             - name: eventstore-db-data
               mountPath: /data/db
-          resources:
+          # resources:
             # requests:
             #   cpu: 200m
             #   memory: 512M

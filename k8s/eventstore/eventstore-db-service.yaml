@@ -4,8 +4,9 @@ metadata:
   namespace: dev
   name: eventstore-db-service
 spec:
-  clusterIP: None 
+  clusterIP: None
   selector:
     service: eventstore-db
   ports:
       - port: 27017
+        protocol: TCP

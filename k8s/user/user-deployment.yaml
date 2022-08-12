@@ -15,7 +15,6 @@ spec:
   template:
     metadata:
       labels:
-        network/user: "true"
         service: user
     spec:
       containers:
@@ -23,7 +22,8 @@ spec:
           name: user
           ports:
             - containerPort: 50051
-          resources:
+              name: grpc
+          # resources:
             # requests:
             #   cpu: 200m
             #   memory: 512M

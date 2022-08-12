@@ -35,6 +35,6 @@ func Run() {
 	logger.Log("transport", "net/tcp", "msg", "listening")
 	err = grpcServer.Serve(lis)
 	if err != nil {
-		logger.Log("transport", "grpc", "msg", "failed serving", "err", err)
+		logger.Log("transport", "grpc", "msg", "failed to serve", "err", err)
 	}
 }
