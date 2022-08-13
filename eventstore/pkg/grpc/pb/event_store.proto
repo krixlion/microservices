@@ -15,7 +15,7 @@ message Event {
     string aggregate_id = 3;
     string aggregate_type = 4;
     string event_data = 5;
-    string channel = 6; // an optional field
+    string channel_name = 6; // an optional field
 }
 
 message CreateEventRequest {

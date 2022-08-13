@@ -19,6 +19,7 @@ func NewEventStoreServer() *EventStoreServer {
 
 func (s *EventStoreServer) Create(context.Context, *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
 	panic("not implemented")
+	s.db.Create(pb.Event{})
 }
 
 func (s *EventStoreServer) Get(context.Context, *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
@@ -30,7 +31,8 @@ func (s *EventStoreServer) GetStream(*pb.GetEventsRequest, pb.EventStore_GetStre
 }
 
 func (s *EventStoreServer) Publish(event *pb.Event) error {
-	rabbitmq, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	const uri = "amqp://guest:guest@rabbitmq-service:5672/"
+	rabbitmq, err := amqp.Dial(uri)
 	if err != nil {
 		return err
 	}
@@ -41,18 +43,27 @@ func (s *EventStoreServer) Publish(event *pb.Event) error {
 	}
 	defer ch.Close()
 
+	err = ch.ExchangeDeclare(
+		"logs",   // name
+		"fanout", // type
+		true,     // durable
+		false,    // auto-deleted
+		false,    // internal
+		false,    // no-wait
+		nil,      // arguments
+	)
+
 	q, err := ch.QueueDeclare(
-		"hello", // name
-		false,   // durable
-		false,   // delete when unused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
+		event.ChannelName, // name
+		true,              // durable
+		false,             // delete when unused
+		false,             // exclusive
+		false,             // no-wait
+		nil,               // arguments
 	)
 	if err != nil {
 		return err
 	}
-
 	err = ch.PublishWithContext(
 		context.Background(),
 		"",     // exchange

@@ -8,7 +8,7 @@ spec:
     matchLabels:
       app: rabbitmq # has to match .spec.template.metadata.labels
   serviceName: rabbitmq-service
-  replicas: 3 # by default is 1
+  replicas: 1 # by default is 1
   minReadySeconds: 10 # by default is 0
   template:
     metadata:
@@ -20,8 +20,8 @@ spec:
       - name: rabbitmq
         image: rabbitmq
         ports:
-        - containerPort: 5672
-          name: amqp
+        - name: amqp
+          containerPort: 5672
         volumeMounts:
         - name: data
           mountPath: /var/lib/rabbitmq/

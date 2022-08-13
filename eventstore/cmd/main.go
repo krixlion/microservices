@@ -1,8 +1,8 @@
 package main
 
 import (
+	"eventstore/cmd/repository"
 	"eventstore/cmd/service"
-	"eventstore/pkg/repository"
 )
 
 func main() {
