@@ -21,7 +21,7 @@ func MakeEventRepository() EventRepository {
 		panic(err)
 	}
 
-	db := client.Database("")
+	db := client.Database("a")
 
 	return EventRepository{
 		db: db,
