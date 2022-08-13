@@ -4,7 +4,7 @@
 # microservices
 *My attempt at creating microservices entirely written in Go*
 <br>
-I've written my own Eventstore using MongoDB as primary database and I'm using RabbitMQ to handle Pub/Sub communication inbetween services.
+I'm writing my own Eventstore using MongoDB as primary database and I'm using RabbitMQ to handle Pub/Sub communication inbetween services.
 
 # Installation
 To launch these services on your cluster you just need to clone the repo and apply Kubernetes manifests located in K8s/ directory.
