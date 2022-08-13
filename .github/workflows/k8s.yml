@@ -30,7 +30,4 @@ jobs:
           
       - name: 'Apply k8s manifests'
         run: |
-          kubectl apply -f k8s/
-          kubectl apply -f k8s/user
-          kubectl apply -f k8s/eventstore
-          kubectl apply -f k8s/rabbitmq
+          kubectl apply -R -f k8s/
