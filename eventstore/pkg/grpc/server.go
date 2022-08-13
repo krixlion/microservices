@@ -10,16 +10,18 @@ import (
 
 type EventStoreServer struct {
 	pb.UnimplementedEventStoreServer
-	db repository.Repository[pb.Event, string]
+	db repository.Repository[*pb.Event, string]
 }
 
 func NewEventStoreServer() *EventStoreServer {
-	return &EventStoreServer{}
+	return &EventStoreServer{
+		db: repository.MakeEventRepository(),
+	}
 }
 
 func (s *EventStoreServer) Create(context.Context, *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
 	panic("not implemented")
-	s.db.Create(pb.Event{})
+	s.db.Create(&pb.Event{})
 	return &pb.CreateEventResponse{}, nil
 }
 
@@ -53,6 +55,9 @@ func (s *EventStoreServer) Publish(event *pb.Event) error {
 		false,    // no-wait
 		nil,      // arguments
 	)
+	if err != nil {
+		return err
+	}
 
 	q, err := ch.QueueDeclare(
 		event.ChannelName, // name
