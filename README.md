@@ -15,6 +15,6 @@ git clone https://github.com/Krixlion/microservices
 kubectl apply -R -f microservices/k8s/
 ```
 
-You might need to tweek some settings to match your cloud provider. I've been using GKE. <br>
+You might need to tweek some settings to match your cloud provider. I'm using GKE for this project. <br>
 Docker images are available in my public repositories on Docker Hub. <br>
-You might as well build them yourself from Dockerfiles included in each of services directories.
+You might as well build them yourself from Dockerfiles included in the repo, each located in corresponding service directory.
