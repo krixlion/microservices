@@ -20,6 +20,7 @@ func NewEventStoreServer() *EventStoreServer {
 func (s *EventStoreServer) Create(context.Context, *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
 	panic("not implemented")
 	s.db.Create(pb.Event{})
+	return &pb.CreateEventResponse{}, nil
 }
 
 func (s *EventStoreServer) Get(context.Context, *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
