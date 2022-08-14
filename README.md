@@ -24,7 +24,7 @@ To launch these services on your cluster you just need to clone the repo.
 git clone https://github.com/Krixlion/microservices
 ```
 
-And apply Kubernetes manifests located in K8s/ directory.
+And apply Kubernetes manifests located in k8s/ directory.
 ```
 kubectl apply -R -f microservices/k8s/
 ```
