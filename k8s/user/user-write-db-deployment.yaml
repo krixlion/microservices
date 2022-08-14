@@ -3,30 +3,30 @@ kind: Deployment
 metadata:
   namespace: dev
   labels:
-    service: user-db-service
-  name: user-db
+    service: user-write-db-service
+  name: user-write-db-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: user-db
+      service: user-write-db-service
   strategy: 
     type: Recreate
   template:
     metadata:
       labels:
-        service: user-db
+        service: user-write-db-service
     spec:
       containers:
-        - env:
-            - name: MONGO_INITDB_ROOT_PASSWORD
+        - image: postgres
+          env:
+            - name: POSTGRES_PASSWORD
               value: admin123
-            - name: MONGO_INITDB_ROOT_USERNAME
+            - name: POSTGRES_USER
               value: admin
-          image: mongo
-          name: microservices-user-db
+          name: user-write-db
           volumeMounts:
-            - name: user-db-data
+            - name: user-write-db-data
               mountPath: /data/db
           ports:
             - containerPort: 27017
@@ -40,6 +40,6 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: user-db-data
+        - name: user-write-db-data
           persistentVolumeClaim:
-            claimName: user-db-claim
+            claimName: user-write-db-claim
