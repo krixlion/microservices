@@ -1,7 +1,7 @@
 # Disclaimer
 **This repo was made as an exercise and should _not_ be used in _production_ environment.**
 
-## Microservices
+## Project description
 *My attempt at creating microservices entirely written in Go*
 
 This repo was made in order to exercise concepts such as CQRS and DDD in practice.
