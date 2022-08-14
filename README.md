@@ -4,7 +4,8 @@
 ## Microservices
 *My attempt at creating microservices entirely written in Go*
 
-I'm writing my own Eventstore using MongoDB as primary database and I'm using RabbitMQ to handle Pub/Sub communication inbetween services.
+This repo was made in order to exercise concepts such as CQRS and DDD in practice.
+I'm writing my own Eventstore using MongoDB as primary database and I'm using RabbitMQ to handle Pub/Sub communication between the services.
 
 I'm using Google Kubernetes Engine for this project.
 
