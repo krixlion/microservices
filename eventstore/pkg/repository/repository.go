@@ -4,5 +4,5 @@ package repository
 type Repository[T, ID any] interface {
 	Create(T) error
 	Get(ID) (T, error)
-	Index() []T
+	Index() ([]T, error)
 }

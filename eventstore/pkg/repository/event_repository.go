@@ -4,13 +4,16 @@ package repository
 import (
 	"context"
 	"eventstore/pkg/grpc/pb"
+	"eventstore/pkg/log"
 
+	kitlog "github.com/go-kit/log"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type EventRepository struct {
-	db *mongo.Database
+	db     *mongo.Database
+	logger kitlog.Logger
 }
 
 func MakeEventRepository() EventRepository {
@@ -24,7 +27,8 @@ func MakeEventRepository() EventRepository {
 	db := client.Database("change-me")
 
 	return EventRepository{
-		db: db,
+		db:     db,
+		logger: log.MakeLogger(),
 	}
 }
 
@@ -33,5 +37,9 @@ func (s EventRepository) Create(data *pb.Event) error {
 }
 
 func (s EventRepository) Get(id string) (*pb.Event, error) {
+	return nil, nil
+}
+
+func (s EventRepository) Index() ([]*pb.Event, error) {
 	return nil, nil
 }

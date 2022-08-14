@@ -28,7 +28,7 @@ func Run() {
 	}
 
 	grpcServer := grpc.NewServer()
-	server := mygrpc.NewEventStoreServer()
+	server := mygrpc.MakeEventStoreServer()
 
 	pb.RegisterEventStoreServer(grpcServer, server)
 
