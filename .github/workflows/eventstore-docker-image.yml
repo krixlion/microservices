@@ -2,11 +2,13 @@ name: Eventstore Docker Image CI
 on:
   workflow_dispatch:
   push:
+    branches:
+    - dev
     paths:
     - 'eventstore/**'
-  pull_request:
-    paths: 
-    - 'eventstore/**'
+  # pull_request:
+  #   paths: 
+  #   - 'eventstore/**'
 
 jobs:
   build:

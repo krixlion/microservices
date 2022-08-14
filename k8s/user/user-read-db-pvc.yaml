@@ -2,9 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   namespace: dev
-  labels:
-    service: user-claim
-  name: user-db-claim
+  name: user-read-db-claim
 spec:
   storageClassName: standard
   accessModes:
@@ -12,4 +10,4 @@ spec:
   reclaimPolicy:
   resources:
     requests:
-      storage: 10Gi
+      storage: 20Gi
