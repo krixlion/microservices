@@ -2,10 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: dev
-  name: user-db-service
+  name: user-read-db-service
 spec:
   clusterIP: None 
   selector:
-    service: user-db
+    app: user-read-db
   ports:
       - port: 27017

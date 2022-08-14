@@ -4,18 +4,18 @@ metadata:
   namespace: dev
   labels:
     service: user-read-db-service
-  name: user-db
+  name: user-read-db
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: user-db
+      app: user-read-db
   strategy: 
     type: Recreate
   template:
     metadata:
       labels:
-        service: user-db
+        app: user-read-db
     spec:
       containers:
         - image: mongo

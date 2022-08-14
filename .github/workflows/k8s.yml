@@ -1,12 +1,14 @@
 name: GKE CD
 on:
+  workflow_dispatch:
   push:
+    branches:
+      - dev
     paths:
     - 'k8s/**'
-  pull_request:
-    paths: 
-    - 'k8s/**'
-  workflow_dispatch:
+  # pull_request:
+  #   paths:
+  #   - 'k8s/**'
 
 jobs:
   build:
