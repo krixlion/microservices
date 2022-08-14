@@ -29,7 +29,7 @@ spec:
           name: user-write-db
           volumeMounts:
             - name: user-write-db-data
-              mountPath: /var/lib/postgresql/data/pgdata
+              mountPath: /var/lib/postgresql/data
           ports:
             - containerPort: 27017
           # resources:
