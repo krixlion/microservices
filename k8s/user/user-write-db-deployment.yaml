@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: dev
+  labels:
+    service: user-write-db-service
+  name: user-write-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-write-db
+  strategy: 
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: user-write-db
+    spec:
+      containers:
+        - image: postgres
+          env:
+            - name: POSTGRES_PASSWORD
+              value: admin123
+            - name: POSTGRES_USER
+              value: admin
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          name: user-write-db
+          volumeMounts:
+            - name: user-write-db-data
+              mountPath: /var/lib/postgresql/data/pgdata
+          ports:
+            - containerPort: 27017
+          # resources:
+            # requests:
+            #   cpu: 200m
+            #   memory: 512M
+            # limits:
+            #   cpu: 1000m
+            #   memory: 3Gi
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: user-write-db-data
+          persistentVolumeClaim:
+            claimName: user-write-db-claim
