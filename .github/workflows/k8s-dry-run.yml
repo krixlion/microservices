@@ -1,15 +1,14 @@
-name: GKE CD
+name: GKE CD dry run
 on:
   workflow_dispatch:
   push:
     branches:
-      - dev
+      - '!dev'
     paths:
     - 'k8s/**'
-  # pull_request:
-  #   paths:
-  #   - 'k8s/**'
-
+  pull_request:
+    paths:
+    - 'k8s/**'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,4 +31,4 @@ jobs:
           
       - name: 'Apply k8s manifests'
         run: |
-          kubectl apply -R -f k8s/
+          kubectl apply -R -f k8s/ --dry-run=client

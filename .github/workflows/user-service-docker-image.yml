@@ -2,11 +2,13 @@ name: User service Docker Image CI
 on:
   workflow_dispatch:
   push:
+    branches:
+      - dev
     paths:
     - 'user/**'
-  pull_request:
-    paths: 
-    - 'user/**'
+  # pull_request:
+  #   paths: 
+  #   - 'user/**'
 
 jobs:
   build:

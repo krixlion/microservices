@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: dev
+  name: user-write-db-claim
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  reclaimPolicy:
+  resources:
+    requests:
+      storage: 20Gi

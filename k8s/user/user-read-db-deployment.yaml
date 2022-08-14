@@ -3,30 +3,30 @@ kind: Deployment
 metadata:
   namespace: dev
   labels:
-    service: user-db-service
-  name: user-db
+    service: user-read-db-service
+  name: user-read-db
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: user-db
+      app: user-read-db
   strategy: 
     type: Recreate
   template:
     metadata:
       labels:
-        service: user-db
+        app: user-read-db
     spec:
       containers:
-        - env:
+        - image: mongo
+          env:
             - name: MONGO_INITDB_ROOT_PASSWORD
               value: admin123
             - name: MONGO_INITDB_ROOT_USERNAME
               value: admin
-          image: mongo
-          name: microservices-user-db
+          name: user-read-db
           volumeMounts:
-            - name: user-db-data
+            - name: user-read-db-data
               mountPath: /data/db
           ports:
             - containerPort: 27017
@@ -40,6 +40,6 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: user-db-data
+        - name: user-read-db-data
           persistentVolumeClaim:
-            claimName: user-db-claim
+            claimName: user-read-db-claim
