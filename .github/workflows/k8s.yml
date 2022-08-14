@@ -29,7 +29,18 @@ jobs:
         run: |
           gcloud components install gke-gcloud-auth-plugin
           gcloud container clusters get-credentials ${{ secrets.CLUSTER_NAME }} --zone europe-central2-a
-          
+        
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v19
+        
       - name: 'Apply k8s manifests'
         run: |
-          kubectl apply -R -f k8s/
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo $file
+            if [[ $file == *.yaml ]]; then
+              kubectl delete -f $file
+              kubectl apply -f $file
+            fi
+          done
+          
