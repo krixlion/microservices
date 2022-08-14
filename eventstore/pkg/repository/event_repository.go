@@ -35,3 +35,7 @@ func (s EventRepository) Create(data *pb.Event) error {
 func (s EventRepository) Get(id string) (*pb.Event, error) {
 	return nil, nil
 }
+
+func (s EventRepository) Index(search string) ([]*pb.Event, error) {
+	return nil, nil
+}

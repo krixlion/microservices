@@ -1,8 +1,8 @@
 package repository
 
 // Repository CRUD abstraction for DB
-type Repository[T, ID any] interface {
+type Repository[T any] interface {
 	Create(T) error
-	Get(ID) (T, error)
-	Index() []T
+	Get(string) (T, error)
+	Index(string) ([]T, error) // takes search params as an argument
 }

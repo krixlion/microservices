@@ -4,13 +4,15 @@ import (
 	"context"
 	"eventstore/pkg/grpc/pb"
 	"eventstore/pkg/repository"
+	"os"
 
+	"github.com/go-kit/log"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type EventStoreServer struct {
 	pb.UnimplementedEventStoreServer
-	db repository.Repository[*pb.Event, string]
+	db repository.Repository[*pb.Event]
 }
 
 func NewEventStoreServer() *EventStoreServer {
@@ -19,18 +21,39 @@ func NewEventStoreServer() *EventStoreServer {
 	}
 }
 
-func (s *EventStoreServer) Create(context.Context, *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
+func (s *EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
 	panic("not implemented")
-	s.db.Create(&pb.Event{})
+	s.db.Create(req.Event)
 	return &pb.CreateEventResponse{}, nil
 }
 
-func (s *EventStoreServer) Get(context.Context, *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
+func (s *EventStoreServer) Get(ctx context.Context, rq *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
 	panic("not implemented")
+	id := rq.GetEventId()
+	s.db.Get(id)
+	return &pb.GetEventsResponse{}, nil
 }
 
-func (s *EventStoreServer) GetStream(*pb.GetEventsRequest, pb.EventStore_GetStreamServer) error {
+func (s *EventStoreServer) GetStream(req *pb.GetEventsRequest, srv pb.EventStore_GetStreamServer) error {
+
 	panic("not implemented")
+
+	logger := log.NewLogfmtLogger(os.Stderr)
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+	logger = log.With(logger, "caller", log.DefaultCaller)
+
+	events, err := s.db.Index(req.GetAggregateId())
+	if err != nil {
+		return err
+	}
+
+	for _, event := range events {
+		if err := srv.Send(event); err != nil {
+			logger.Log("transport", "grpc", "msg", "failed to send in stream", "err", err)
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *EventStoreServer) Publish(event *pb.Event) error {
