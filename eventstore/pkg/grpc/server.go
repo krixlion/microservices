@@ -46,7 +46,7 @@ func (s *EventStoreServer) Get(ctx context.Context, rq *pb.GetEventsRequest) (*p
 	}
 	var events []*pb.Event
 	events = append(events, event)
-	return &pb.GetEventsResponse{events}, nil
+	return &pb.GetEventsResponse{Events: events}, nil
 }
 
 func (s *EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventStore_GetStreamServer) error {
