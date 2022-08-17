@@ -4,9 +4,7 @@ import (
 	"context"
 	"eventstore/pkg/grpc/pb"
 	"eventstore/pkg/repository"
-	"os"
 
-	"github.com/go-kit/log"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -22,25 +20,32 @@ func NewEventStoreServer() *EventStoreServer {
 }
 
 func (s *EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
-	panic("not implemented")
-	s.db.Create(req.Event)
-	return &pb.CreateEventResponse{}, nil
+	// Save document to DB
+	if err := s.db.Create(req.Event); err != nil {
+		return &pb.CreateEventResponse{
+			IsSuccess: false,
+			Error:     err.Error(),
+		}, err
+	}
+	return &pb.CreateEventResponse{
+		IsSuccess: true,
+		Error:     "",
+	}, nil
 }
 
 func (s *EventStoreServer) Get(ctx context.Context, rq *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
-	panic("not implemented")
 	id := rq.GetEventId()
-	s.db.Get(id)
-	return &pb.GetEventsResponse{}, nil
+	// Get document from DB
+	event, err := s.db.Get(id)
+	if err != nil {
+		return &pb.GetEventsResponse{}, err
+	}
+	var events []*pb.Event
+	events = append(events, event)
+	return &pb.GetEventsResponse{events}, nil
 }
 
-func (s *EventStoreServer) GetStream(req *pb.GetEventsRequest, srv pb.EventStore_GetStreamServer) error {
-
-	panic("not implemented")
-
-	logger := log.NewLogfmtLogger(os.Stderr)
-	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
-	logger = log.With(logger, "caller", log.DefaultCaller)
+func (s *EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventStore_GetStreamServer) error {
 
 	events, err := s.db.Index(req.GetAggregateId())
 	if err != nil {
@@ -48,8 +53,8 @@ func (s *EventStoreServer) GetStream(req *pb.GetEventsRequest, srv pb.EventStore
 	}
 
 	for _, event := range events {
-		if err := srv.Send(event); err != nil {
-			logger.Log("transport", "grpc", "msg", "failed to send in stream", "err", err)
+		if err := stream.Send(event); err != nil {
+			s.logger.Log("transport", "grpc", "msg", "failed to stream event", "err", err)
 			return err
 		}
 	}
@@ -70,7 +75,7 @@ func (s *EventStoreServer) Publish(event *pb.Event) error {
 	defer ch.Close()
 
 	err = ch.ExchangeDeclare(
-		"logs",   // name
+		"events", // name
 		"fanout", // type
 		true,     // durable
 		false,    // auto-deleted
