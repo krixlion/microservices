@@ -23,28 +23,46 @@ func MakeEventStoreServer() EventStoreServer {
 	}
 }
 
-func (s EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
-	err := s.repo.Create(ctx, req.Event)
-
-	if err != nil {
+func (s *EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
+	// Save document to DB
+	if err := s.repo.Create(ctx, req.Event); err != nil {
 		return &pb.CreateEventResponse{
 			IsSuccess: false,
 			Error:     err.Error(),
 		}, err
 	}
-
 	return &pb.CreateEventResponse{
 		IsSuccess: true,
 		Error:     "",
 	}, nil
 }
 
-func (s EventStoreServer) Get(context.Context, *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
-	panic("not implemented")
+func (s *EventStoreServer) Get(ctx context.Context, rq *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
+	id := rq.GetEventId()
+	// Get document from DB
+	event, err := s.repo.Get(ctx, id)
+	if err != nil {
+		return &pb.GetEventsResponse{}, err
+	}
+	var events []*pb.Event
+	events = append(events, event)
+	return &pb.GetEventsResponse{Events: events}, nil
 }
 
-func (s EventStoreServer) GetStream(*pb.GetEventsRequest, pb.EventStore_GetStreamServer) error {
-	panic("not implemented")
+func (s *EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventStore_GetStreamServer) error {
+	ctx := stream.Context()
+	events, err := s.repo.Index(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, event := range events {
+		if err := stream.Send(event); err != nil {
+			s.logger.Log("transport", "grpc", "msg", "failed to stream event", "err", err)
+			return err
+		}
+	}
+	return nil
 }
 
 func (s EventStoreServer) Publish(event *pb.Event) error {
@@ -61,7 +79,7 @@ func (s EventStoreServer) Publish(event *pb.Event) error {
 	defer ch.Close()
 
 	err = ch.ExchangeDeclare(
-		"logs",   // name
+		"events", // name
 		"fanout", // type
 		true,     // durable
 		false,    // auto-deleted

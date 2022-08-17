@@ -80,3 +80,7 @@ func (s EventRepository) Index(ctx context.Context) ([]*pb.Event, error) {
 	}
 	return nil, nil
 }
+
+func (s EventRepository) Index(search string) ([]*pb.Event, error) {
+	return nil, nil
+}
