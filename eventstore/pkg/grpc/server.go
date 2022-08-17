@@ -23,7 +23,7 @@ func MakeEventStoreServer() EventStoreServer {
 	}
 }
 
-func (s *EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
+func (s EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
 	// Save document to DB
 	if err := s.repo.Create(ctx, req.Event); err != nil {
 		return &pb.CreateEventResponse{
@@ -37,7 +37,7 @@ func (s *EventStoreServer) Create(ctx context.Context, req *pb.CreateEventReques
 	}, nil
 }
 
-func (s *EventStoreServer) Get(ctx context.Context, rq *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
+func (s EventStoreServer) Get(ctx context.Context, rq *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
 	id := rq.GetEventId()
 	// Get document from DB
 	event, err := s.repo.Get(ctx, id)
@@ -49,7 +49,7 @@ func (s *EventStoreServer) Get(ctx context.Context, rq *pb.GetEventsRequest) (*p
 	return &pb.GetEventsResponse{Events: events}, nil
 }
 
-func (s *EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventStore_GetStreamServer) error {
+func (s EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventStore_GetStreamServer) error {
 	ctx := stream.Context()
 	events, err := s.repo.Index(ctx)
 	if err != nil {

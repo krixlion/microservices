@@ -52,7 +52,7 @@ func (s EventRepository) Create(ctx context.Context, data *pb.Event) error {
 }
 
 func (s EventRepository) Get(ctx context.Context, id string) (*pb.Event, error) {
-	cursor, err := s.db.Collection("events").Find(ctx, bson.D{{"_id": id}})
+	cursor, err := s.db.Collection("events").Find(ctx, bson.D{{"_id", id}})
 	if err != nil {
 		s.logger.Log("msg", "failed to get event", "db", "err", err)
 		return nil, err
@@ -78,9 +78,5 @@ func (s EventRepository) Index(ctx context.Context) ([]*pb.Event, error) {
 	if err = cursor.All(context.TODO(), &results); err != nil {
 		return nil, err
 	}
-	return nil, nil
-}
-
-func (s EventRepository) Index(search string) ([]*pb.Event, error) {
 	return nil, nil
 }
