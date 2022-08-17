@@ -3,6 +3,7 @@ option go_package="./pb";
 
 package eventstore;
 
+
 service EventStore {
     rpc Create(CreateEventRequest) returns (CreateEventResponse) {}
     rpc Get(GetEventsRequest) returns (GetEventsResponse) {}
@@ -10,11 +11,11 @@ service EventStore {
 } 
 
 message Event {
-    string event_id = 1;
-    string event_type = 2;
-    string aggregate_id = 3;
-    string aggregate_type = 4;
-    string event_data = 5;
+    string event_id = 1;// @gotags: bson:"_id,omitempty"
+    string event_type = 2; // @gotags: bson:"event_type,omitempty"
+    string aggregate_id = 3; // @gotags: bson:"aggregate_id,omitempty"
+    string aggregate_type = 4; // @gotags: bson:"aggregate_type,omitempty"
+    string event_data = 5; // @gotags: bson:"event_data,omitempty"
     string channel_name = 6; // an optional field
 }
 

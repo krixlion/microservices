@@ -3,37 +3,51 @@ package grpc
 import (
 	"context"
 	"eventstore/pkg/grpc/pb"
+	"eventstore/pkg/log"
 	"eventstore/pkg/repository"
 
+	kitlog "github.com/go-kit/log"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type EventStoreServer struct {
 	pb.UnimplementedEventStoreServer
-	db repository.Repository[*pb.Event, string]
+	repo   repository.Repository[*pb.Event]
+	logger kitlog.Logger
 }
 
-func NewEventStoreServer() *EventStoreServer {
-	return &EventStoreServer{
-		db: repository.MakeEventRepository(),
+func MakeEventStoreServer() EventStoreServer {
+	return EventStoreServer{
+		repo:   repository.MakeEventRepository(),
+		logger: log.MakeLogger(),
 	}
 }
 
-func (s *EventStoreServer) Create(context.Context, *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
-	panic("not implemented")
-	s.db.Create(&pb.Event{})
-	return &pb.CreateEventResponse{}, nil
+func (s EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
+	err := s.repo.Create(ctx, req.Event)
+
+	if err != nil {
+		return &pb.CreateEventResponse{
+			IsSuccess: false,
+			Error:     err.Error(),
+		}, err
+	}
+
+	return &pb.CreateEventResponse{
+		IsSuccess: true,
+		Error:     "",
+	}, nil
 }
 
-func (s *EventStoreServer) Get(context.Context, *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
+func (s EventStoreServer) Get(context.Context, *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
 	panic("not implemented")
 }
 
-func (s *EventStoreServer) GetStream(*pb.GetEventsRequest, pb.EventStore_GetStreamServer) error {
+func (s EventStoreServer) GetStream(*pb.GetEventsRequest, pb.EventStore_GetStreamServer) error {
 	panic("not implemented")
 }
 
-func (s *EventStoreServer) Publish(event *pb.Event) error {
+func (s EventStoreServer) Publish(event *pb.Event) error {
 	const uri = "amqp://guest:guest@rabbitmq-service:5672/"
 	rabbitmq, err := amqp.Dial(uri)
 	if err != nil {

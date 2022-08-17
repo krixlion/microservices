@@ -23,6 +23,8 @@ spec:
               value: admin123
             - name: MONGO_INITDB_ROOT_USERNAME
               value: admin
+            - name: MONGO_INITDB_DATABASE 
+              value: eventstore
           image: mongo
           ports:
             - containerPort: 27017
