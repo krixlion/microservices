@@ -12,21 +12,31 @@ import (
 
 type EventStoreServer struct {
 	pb.UnimplementedEventStoreServer
-	db     repository.Repository[*pb.Event, string]
+	repo   repository.Repository[*pb.Event]
 	logger kitlog.Logger
 }
 
 func MakeEventStoreServer() EventStoreServer {
 	return EventStoreServer{
-		db:     repository.MakeEventRepository(),
+		repo:   repository.MakeEventRepository(),
 		logger: log.MakeLogger(),
 	}
 }
 
-func (s EventStoreServer) Create(context.Context, *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
-	panic("not implemented")
-	s.db.Create(&pb.Event{})
-	return &pb.CreateEventResponse{}, nil
+func (s EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
+	err := s.repo.Create(ctx, req.Event)
+
+	if err != nil {
+		return &pb.CreateEventResponse{
+			IsSuccess: false,
+			Error:     err.Error(),
+		}, err
+	}
+
+	return &pb.CreateEventResponse{
+		IsSuccess: true,
+		Error:     "",
+	}, nil
 }
 
 func (s EventStoreServer) Get(context.Context, *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {

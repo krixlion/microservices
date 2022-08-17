@@ -22,7 +22,7 @@ func Run() {
 	logger = log.With(logger, "caller", log.DefaultCaller)
 
 	flag.Parse()
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", *port))
 	if err != nil {
 		logger.Log("transport", "net/tcp", "msg", "failed listening", "err", err)
 	}

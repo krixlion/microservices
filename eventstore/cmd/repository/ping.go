@@ -2,8 +2,9 @@ package repository
 
 import (
 	"context"
-	"fmt"
+	"os"
 
+	"github.com/go-kit/log"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -26,5 +27,10 @@ func Ping() {
 	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
 		panic(err)
 	}
-	fmt.Println("Successfully connected and pinged.")
+
+	logger := log.NewLogfmtLogger(os.Stderr)
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+	logger = log.With(logger, "caller", log.DefaultCaller)
+
+	logger.Log("transport", "mongodb", "msg", "succesfully pinged and connected to the DB")
 }
