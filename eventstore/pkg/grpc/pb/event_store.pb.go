@@ -25,12 +25,12 @@ type Event struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	EventId       string `protobuf:"bytes,1,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"`
-	EventType     string `protobuf:"bytes,2,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`
-	AggregateId   string `protobuf:"bytes,3,opt,name=aggregate_id,json=aggregateId,proto3" json:"aggregate_id,omitempty"`
-	AggregateType string `protobuf:"bytes,4,opt,name=aggregate_type,json=aggregateType,proto3" json:"aggregate_type,omitempty"`
-	EventData     string `protobuf:"bytes,5,opt,name=event_data,json=eventData,proto3" json:"event_data,omitempty"`
-	ChannelName   string `protobuf:"bytes,6,opt,name=channel_name,json=channelName,proto3" json:"channel_name,omitempty"` // an optional field
+	EventId       string `protobuf:"bytes,1,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty" bson:"_id,omitempty"`                   // @gotags: bson:"_id,omitempty"
+	EventType     string `protobuf:"bytes,2,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty" bson:"event_type,omitempty"`             // @gotags: bson:"event_type,omitempty"
+	AggregateId   string `protobuf:"bytes,3,opt,name=aggregate_id,json=aggregateId,proto3" json:"aggregate_id,omitempty" bson:"aggregate_id,omitempty"`       // @gotags: bson:"aggregate_id,omitempty"
+	AggregateType string `protobuf:"bytes,4,opt,name=aggregate_type,json=aggregateType,proto3" json:"aggregate_type,omitempty" bson:"aggregate_type,omitempty"` // @gotags: bson:"aggregate_type,omitempty"
+	EventData     string `protobuf:"bytes,5,opt,name=event_data,json=eventData,proto3" json:"event_data,omitempty" bson:"event_data,omitempty"`             // @gotags: bson:"event_data,omitempty"
+	ChannelName   string `protobuf:"bytes,6,opt,name=channel_name,json=channelName,proto3" json:"channel_name,omitempty"`       // an optional field
 }
 
 func (x *Event) Reset() {

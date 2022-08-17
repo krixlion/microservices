@@ -3,25 +3,29 @@ package grpc
 import (
 	"context"
 	"eventstore/pkg/grpc/pb"
+	"eventstore/pkg/log"
 	"eventstore/pkg/repository"
 
+	kitlog "github.com/go-kit/log"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type EventStoreServer struct {
 	pb.UnimplementedEventStoreServer
-	db repository.Repository[*pb.Event]
+	repo   repository.Repository[*pb.Event]
+	logger kitlog.Logger
 }
 
-func NewEventStoreServer() *EventStoreServer {
-	return &EventStoreServer{
-		db: repository.MakeEventRepository(),
+func MakeEventStoreServer() EventStoreServer {
+	return EventStoreServer{
+		repo:   repository.MakeEventRepository(),
+		logger: log.MakeLogger(),
 	}
 }
 
 func (s *EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
 	// Save document to DB
-	if err := s.db.Create(req.Event); err != nil {
+	if err := s.repo.Create(ctx, req.Event); err != nil {
 		return &pb.CreateEventResponse{
 			IsSuccess: false,
 			Error:     err.Error(),
@@ -36,7 +40,7 @@ func (s *EventStoreServer) Create(ctx context.Context, req *pb.CreateEventReques
 func (s *EventStoreServer) Get(ctx context.Context, rq *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
 	id := rq.GetEventId()
 	// Get document from DB
-	event, err := s.db.Get(id)
+	event, err := s.repo.Get(ctx, id)
 	if err != nil {
 		return &pb.GetEventsResponse{}, err
 	}
@@ -46,8 +50,8 @@ func (s *EventStoreServer) Get(ctx context.Context, rq *pb.GetEventsRequest) (*p
 }
 
 func (s *EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventStore_GetStreamServer) error {
-
-	events, err := s.db.Index(req.GetAggregateId())
+	ctx := stream.Context()
+	events, err := s.repo.Index(ctx)
 	if err != nil {
 		return err
 	}
@@ -61,7 +65,7 @@ func (s *EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventSt
 	return nil
 }
 
-func (s *EventStoreServer) Publish(event *pb.Event) error {
+func (s EventStoreServer) Publish(event *pb.Event) error {
 	const uri = "amqp://guest:guest@rabbitmq-service:5672/"
 	rabbitmq, err := amqp.Dial(uri)
 	if err != nil {
