@@ -39,7 +39,11 @@ func MakeEventRepository() EventRepository {
 
 func (s EventRepository) Create(ctx context.Context, data *pb.Event) error {
 	doc := bson.D{
-		{"_id", data.EventId}, {"event_type", data.EventType}, {"aggregate_id", data.AggregateId},
+		{"_id", data.EventId},
+		{"event_type", data.EventType},
+		{"aggregate_id", data.AggregateId},
+		{"aggregate_type", data.AggregateType},
+		{"event_data", data.EventData},
 	}
 	_, err := s.db.Collection("events").InsertOne(ctx, doc)
 
