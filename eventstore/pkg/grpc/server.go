@@ -71,6 +71,7 @@ func (s EventStoreServer) Publish(event *pb.Event) error {
 	if err != nil {
 		return err
 	}
+
 	defer rabbitmq.Close()
 	ch, err := rabbitmq.Channel()
 	if err != nil {
