@@ -76,8 +76,8 @@ func (s EventStoreServer) Get(ctx context.Context, rq *pb.GetEventsRequest) (*pb
 	if err != nil {
 		return nil, err
 	}
-	s.logger.Log("transport", "grpc", "msg", "succesfully sent get response")
 
+	s.logger.Log("transport", "grpc", "msg", "succesfully sent get response")
 	return &pb.GetEventsResponse{Event: event}, nil
 }
 
