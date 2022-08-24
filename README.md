@@ -28,4 +28,5 @@ And apply Kubernetes manifests located in k8s/ directory.
 ```
 kubectl apply -R -f microservices/k8s/
 ```
+
 You might need to tweek some settings to match your cloud provider. 
