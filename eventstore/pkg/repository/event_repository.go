@@ -20,8 +20,7 @@ type EventRepository struct {
 func MakeEventRepository() EventRepository {
 	uri := "mongodb://admin:admin123@eventstore-db-service:27017"
 	reg := bson.NewRegistryBuilder().Build()
-	client_opts := options.Client().ApplyURI(uri)
-	client_opts.Registry = reg
+	client_opts := options.Client().ApplyURI(uri).SetRegistry(reg)
 
 	client, err := mongo.Connect(context.Background(), client_opts)
 
@@ -37,35 +36,34 @@ func MakeEventRepository() EventRepository {
 	}
 }
 
-func (s EventRepository) Create(ctx context.Context, data *pb.Event) error {
+func (repo EventRepository) Create(ctx context.Context, event *pb.Event) error {
 	doc := bson.D{
-		{"_id", data.EventId},
-		{"event_type", data.EventType},
-		{"aggregate_id", data.AggregateId},
-		{"aggregate_type", data.AggregateType},
-		{"event_data", data.EventData},
-		{"channel_name", data.ChannelName},
+		{"event_type", event.GetEventType()},
+		{"aggregate_id", event.GetAggregateId()},
+		{"aggregate_type", event.GetAggregateType()},
+		{"event_data", event.GetEventData()},
+		{"channel_name", event.GetChannelName()},
 	}
-	_, err := s.db.Collection("events").InsertOne(ctx, doc)
+	_, err := repo.db.Collection("events").InsertOne(ctx, doc)
 
 	if err != nil {
-		s.logger.Log("msg", "failed to create event", "err", err)
+		repo.logger.Log("msg", "failed to create event", "err", err)
 		return err
 	}
-
+	repo.logger.Log("msg", "succesfully created an event")
 	return nil
 }
 
-func (s EventRepository) Get(ctx context.Context, id string) (*pb.Event, error) {
-	cursor, err := s.db.Collection("events").Find(ctx, bson.M{"_id": id})
+func (repo EventRepository) Get(ctx context.Context, id string) (*pb.Event, error) {
+	cursor, err := repo.db.Collection("events").Find(ctx, bson.M{"_id": id})
 	if err != nil {
-		s.logger.Log("msg", "failed to get event", "err", err)
+		repo.logger.Log("msg", "failed to get event", "err", err)
 		return nil, err
 	}
 
 	var results []*pb.Event
 	// check for errors in the conversion
-	if err = cursor.All(context.TODO(), &results); err != nil {
+	if err = cursor.All(ctx, &results); err != nil {
 		return nil, err
 	}
 
@@ -75,16 +73,16 @@ func (s EventRepository) Get(ctx context.Context, id string) (*pb.Event, error) 
 	return nil, nil
 }
 
-func (s EventRepository) Index(ctx context.Context) ([]*pb.Event, error) {
-	cursor, err := s.db.Collection("events").Find(ctx, bson.D{})
+func (repo EventRepository) Index(ctx context.Context) ([]*pb.Event, error) {
+	cursor, err := repo.db.Collection("events").Find(ctx, bson.D{})
 	if err != nil {
-		s.logger.Log("msg", "failed to get event", "err", err)
+		repo.logger.Log("msg", "failed to get event", "err", err)
 		return nil, err
 	}
 
 	var results []*pb.Event
 	// check for errors in the conversion
-	if err = cursor.All(context.TODO(), &results); err != nil {
+	if err = cursor.All(ctx, &results); err != nil {
 		return nil, err
 	}
 	return results, nil

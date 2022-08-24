@@ -25,7 +25,6 @@ message CreateEventRequest {
 
 message CreateEventResponse {
     bool is_success = 1;
-    string error = 2;
 }
 
 message GetEventsRequest {
@@ -34,5 +33,5 @@ message GetEventsRequest {
 }
 
 message GetEventsResponse {
-    repeated Event events = 1;
+    Event event = 1;
 }

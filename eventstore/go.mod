@@ -4,8 +4,10 @@ go 1.18
 
 require (
 	github.com/go-kit/log v0.2.1
+	github.com/matryer/is v1.4.0
 	github.com/rabbitmq/amqp091-go v1.4.0
 	go.mongodb.org/mongo-driver v1.10.1
+	google.golang.org/genproto v0.0.0-20220822141531-cb6d359b7ced
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
 )
@@ -26,5 +28,4 @@ require (
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
 	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	google.golang.org/genproto v0.0.0-20210226172003-ab064af71705 // indirect
 )

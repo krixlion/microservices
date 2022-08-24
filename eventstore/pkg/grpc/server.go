@@ -5,9 +5,14 @@ import (
 	"eventstore/pkg/grpc/pb"
 	"eventstore/pkg/log"
 	"eventstore/pkg/repository"
+	"fmt"
 
 	kitlog "github.com/go-kit/log"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"go.mongodb.org/mongo-driver/mongo"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type EventStoreServer struct {
@@ -23,44 +28,75 @@ func MakeEventStoreServer() EventStoreServer {
 	}
 }
 
+func FmtDupKeyErr(err error) error {
+	logger := log.MakeLogger()
+	badReq := &errdetails.BadRequest{}
+	violation := &errdetails.BadRequest_FieldViolation{
+		Field:       "event_id",
+		Description: err.Error(),
+	}
+	badReq.FieldViolations = append(badReq.FieldViolations, violation)
+
+	st, statusErr := status.New(codes.AlreadyExists, "Event with given ID already exists").WithDetails(badReq)
+	if statusErr != nil {
+		logger.Log("transport", "gRPC", "msg", "Unexpected error attaching metadata", "err", err)
+		panic(fmt.Sprintf("Unexpected error attaching metadata: %v", err))
+	}
+
+	err = st.Err()
+	return err
+}
+
 func (s EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
 	// Save document to DB
 	if err := s.repo.Create(ctx, req.Event); err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			err = FmtDupKeyErr(err)
+		}
 		return &pb.CreateEventResponse{
 			IsSuccess: false,
-			Error:     err.Error(),
 		}, err
 	}
+
 	return &pb.CreateEventResponse{
 		IsSuccess: true,
-		Error:     "",
 	}, nil
 }
 
 func (s EventStoreServer) Get(ctx context.Context, rq *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
 	id := rq.GetEventId()
+	if id == "" {
+		return nil, status.Error(codes.InvalidArgument, "Invalid ID")
+	}
 	// Get document from DB
 	event, err := s.repo.Get(ctx, id)
-	if err != nil {
-		return &pb.GetEventsResponse{}, err
+	if event == nil {
+		return nil, status.Error(codes.NotFound, "Event not found")
 	}
-	var events []*pb.Event
-	events = append(events, event)
-	return &pb.GetEventsResponse{Events: events}, nil
+	if err != nil {
+		return nil, err
+	}
+
+	s.logger.Log("transport", "grpc", "msg", "succesfully sent get response")
+	return &pb.GetEventsResponse{Event: event}, nil
 }
 
 func (s EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventStore_GetStreamServer) error {
 	ctx := stream.Context()
 	events, err := s.repo.Index(ctx)
 	if err != nil {
-		return err
+		s.logger.Log("transport", "mongodb", "msg", "failed to retrieve events", "err", err)
+		return status.Convert(err).Err()
 	}
 
+	// Begin streaming events
 	for _, event := range events {
+		// If client is unavailable Send() will return an error and abort streaming
 		if err := stream.Send(event); err != nil {
-			s.logger.Log("transport", "grpc", "msg", "failed to stream event", "err", err)
-			return err
+			s.logger.Log("transport", "grpc", "msg", "stopped streaming events", "err", err)
+			return status.Convert(err).Err()
 		}
+		s.logger.Log("transport", "grpc", "msg", "succesfully sent stream response")
 	}
 	return nil
 }
