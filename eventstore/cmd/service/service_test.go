@@ -8,6 +8,7 @@ import (
 	"net"
 	"testing"
 
+	"github.com/matryer/is"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/test/bufconn"
@@ -34,24 +35,43 @@ func bufDialer(context.Context, string) (net.Conn, error) {
 }
 
 func TestCreateAndGet(t *testing.T) {
+	is := is.New(t)
 	ctx := context.Background()
+
 	conn, err := grpc.DialContext(ctx, "bufnet", grpc.WithContextDialer(bufDialer), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		t.Fatalf("Failed to dial bufnet: %v", err)
 	}
 	defer conn.Close()
+
 	client := pb.NewEventStoreClient(conn)
+
+	event := &pb.Event{
+		EventId:       "2345",
+		EventType:     "UserCreated",
+		AggregateId:   "user",
+		AggregateType: "service",
+		EventData:     "name: imie",
+		ChannelName:   "user",
+	}
+	createResponse, err := client.Create(ctx, &pb.CreateEventRequest{
+		Event: event,
+	})
+
+	if !createResponse.IsSuccess {
+		t.Fatalf("Failed to create event, err: %v", err)
+	}
+
 	resp, err := client.Get(ctx, &pb.GetEventsRequest{
-		EventId:     "",
-		AggregateId: "",
+		EventId:     "2345",
+		AggregateId: "user",
 	})
 	if err != nil {
 		t.Fatalf("Failed to get: %v", err)
 	}
+
 	want := &pb.GetEventsResponse{
-		Events: []*pb.Event{},
+		Event: event,
 	}
-	if resp != want {
-		t.Fatalf("Received response is not equal to expected response")
-	}
+	is.Equal(resp, want)
 }
