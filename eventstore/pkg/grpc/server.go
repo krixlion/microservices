@@ -90,10 +90,10 @@ func (s EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventSto
 	for _, event := range events {
 		// If client is unavailable Send() will return an error and abort streaming
 		if err := stream.Send(event); err != nil {
-			s.logger.Log("transport", "grpc", "msg", "stopped streaming events", "err", err)
+			s.logger.Log("transport", "grpc", "procedure", "getStream", "msg", "stopped streaming events", "err", err)
 			return status.Convert(err).Err()
 		}
-		s.logger.Log("transport", "grpc", "msg", "succesfully sent stream response")
+		s.logger.Log("transport", "grpc", "procedure", "getStream", "msg", "success")
 	}
 	return nil
 }
