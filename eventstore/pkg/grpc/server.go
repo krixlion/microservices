@@ -29,7 +29,6 @@ func MakeEventStoreServer() EventStoreServer {
 }
 
 func FmtDupKeyErr(err error) error {
-	logger := log.MakeLogger()
 	badReq := &errdetails.BadRequest{}
 	violation := &errdetails.BadRequest_FieldViolation{
 		Field:       "event_id",
@@ -39,7 +38,6 @@ func FmtDupKeyErr(err error) error {
 
 	st, statusErr := status.New(codes.AlreadyExists, "Event with given ID already exists").WithDetails(badReq)
 	if statusErr != nil {
-		logger.Log("transport", "gRPC", "msg", "Unexpected error attaching metadata", "err", err)
 		panic(fmt.Sprintf("Unexpected error attaching metadata: %v", err))
 	}
 
@@ -57,27 +55,26 @@ func (s EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest
 			IsSuccess: false,
 		}, err
 	}
-
+	s.logger.Log("transport", "grpc", "procedure", "create", "msg", "success")
 	return &pb.CreateEventResponse{
 		IsSuccess: true,
 	}, nil
 }
 
-func (s EventStoreServer) Get(ctx context.Context, rq *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
-	id := rq.GetEventId()
+func (s EventStoreServer) Get(ctx context.Context, req *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
+	id := req.GetEventId()
 	if id == "" {
 		return nil, status.Error(codes.InvalidArgument, "Invalid ID")
 	}
 	// Get document from DB
 	event, err := s.repo.Get(ctx, id)
-	if event == nil {
+
+	if err != nil {
+		s.logger.Log("transport", "grpc", "procedure", "get", "msg", "failure", "err", err)
 		return nil, status.Error(codes.NotFound, "Event not found")
 	}
-	if err != nil {
-		return nil, err
-	}
 
-	s.logger.Log("transport", "grpc", "msg", "succesfully sent get response")
+	s.logger.Log("transport", "grpc", "procedure", "get", "msg", "success")
 	return &pb.GetEventsResponse{Event: event}, nil
 }
 

@@ -55,22 +55,14 @@ func (repo EventRepository) Create(ctx context.Context, event *pb.Event) error {
 }
 
 func (repo EventRepository) Get(ctx context.Context, id string) (*pb.Event, error) {
-	cursor, err := repo.db.Collection("events").Find(ctx, bson.M{"_id": id})
+	var results *pb.Event
+	err := repo.db.Collection("events").FindOne(ctx, bson.M{"_id": id}).Decode(&results)
 	if err != nil {
 		repo.logger.Log("msg", "failed to get event", "err", err)
 		return nil, err
 	}
 
-	var results []*pb.Event
-	// check for errors in the conversion
-	if err = cursor.All(ctx, &results); err != nil {
-		return nil, err
-	}
-
-	if len(results) > 0 {
-		return results[0], nil
-	}
-	return nil, nil
+	return results, nil
 }
 
 func (repo EventRepository) Index(ctx context.Context) ([]*pb.Event, error) {
