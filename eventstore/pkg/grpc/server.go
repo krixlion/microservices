@@ -82,7 +82,7 @@ func (s EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventSto
 	ctx := stream.Context()
 	events, err := s.repo.Index(ctx)
 	if err != nil {
-		s.logger.Log("transport", "mongodb", "msg", "failed to retrieve events", "err", err)
+		s.logger.Log("transport", "grpc", "procedure", "getStream", "msg", "failure", "err", err)
 		return status.Convert(err).Err()
 	}
 
@@ -90,7 +90,7 @@ func (s EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventSto
 	for _, event := range events {
 		// If client is unavailable Send() will return an error and abort streaming
 		if err := stream.Send(event); err != nil {
-			s.logger.Log("transport", "grpc", "procedure", "getStream", "msg", "stopped streaming events", "err", err)
+			s.logger.Log("transport", "grpc", "procedure", "getStream", "msg", "failure", "err", err)
 			return status.Convert(err).Err()
 		}
 		s.logger.Log("transport", "grpc", "procedure", "getStream", "msg", "success")
@@ -98,7 +98,7 @@ func (s EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventSto
 	return nil
 }
 
-func (s EventStoreServer) Publish(event *pb.Event) error {
+func (s EventStoreServer) Publish(ctx context.Context, event *pb.Event) error {
 	const uri = "amqp://guest:guest@rabbitmq-service:5672/"
 	rabbitmq, err := amqp.Dial(uri)
 	if err != nil {
@@ -137,7 +137,7 @@ func (s EventStoreServer) Publish(event *pb.Event) error {
 		return err
 	}
 	err = ch.PublishWithContext(
-		context.Background(),
+		ctx,
 		"",     // exchange
 		q.Name, // routing key
 		false,  // mandatory

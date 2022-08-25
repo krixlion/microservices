@@ -3,12 +3,11 @@ package service
 import (
 	mygrpc "eventstore/pkg/grpc"
 	"eventstore/pkg/grpc/pb"
+	"eventstore/pkg/log"
 	"flag"
 	"fmt"
 	"net"
-	"os"
 
-	"github.com/go-kit/log"
 	"google.golang.org/grpc"
 )
 
@@ -17,9 +16,7 @@ var (
 )
 
 func Run() {
-	logger := log.NewLogfmtLogger(os.Stderr)
-	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
-	logger = log.With(logger, "caller", log.DefaultCaller)
+	logger := log.MakeLogger()
 
 	flag.Parse()
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", *port))
