@@ -6,7 +6,6 @@ import (
 	"eventstore/pkg/log"
 	"eventstore/pkg/repository"
 
-	kitlog "github.com/go-kit/log"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -14,14 +13,14 @@ import (
 
 type EventStoreServer struct {
 	pb.UnimplementedEventStoreServer
-	repo   repository.Repository[*pb.Event]
-	logger kitlog.Logger
+	repo repository.Repository[*pb.Event]
+	// logger kitlog.Logger
 }
 
 func MakeEventStoreServer() EventStoreServer {
 	return EventStoreServer{
-		repo:   repository.MakeEventRepository(),
-		logger: log.MakeLogger(),
+		repo: repository.MakeEventRepository(),
+		// logger: log.MakeLogger(),
 	}
 }
 
@@ -32,7 +31,7 @@ func (s EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest
 			IsSuccess: false,
 		}, status.Convert(err).Err()
 	}
-	s.logger.Log("transport", "grpc", "procedure", "create", "msg", "success")
+	log.Println("transport", "grpc", "procedure", "create", "msg", "success")
 	return &pb.CreateEventResponse{
 		IsSuccess: true,
 	}, nil
@@ -47,11 +46,11 @@ func (s EventStoreServer) Get(ctx context.Context, req *pb.GetEventsRequest) (*p
 	event, err := s.repo.Get(ctx, id)
 
 	if err != nil {
-		s.logger.Log("transport", "grpc", "procedure", "get", "msg", "failure", "err", err)
+		log.Println("transport", "grpc", "procedure", "get", "msg", "failure", "err", err)
 		return nil, status.Error(codes.NotFound, "Event not found")
 	}
 
-	s.logger.Log("transport", "grpc", "procedure", "get", "msg", "success")
+	log.Println("transport", "grpc", "procedure", "get", "msg", "success")
 	return &pb.GetEventsResponse{Event: event}, nil
 }
 
@@ -59,7 +58,7 @@ func (s EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventSto
 	ctx := stream.Context()
 	events, err := s.repo.Index(ctx)
 	if err != nil {
-		s.logger.Log("transport", "grpc", "procedure", "getStream", "msg", "failure", "err", err)
+		log.Println("transport", "grpc", "procedure", "getStream", "msg", "failure", "err", err)
 		return status.Convert(err).Err()
 	}
 
@@ -67,10 +66,10 @@ func (s EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventSto
 	for _, event := range events {
 		// If client is unavailable Send() will return an error and abort streaming
 		if err := stream.Send(event); err != nil {
-			s.logger.Log("transport", "grpc", "procedure", "getStream", "msg", "failure", "err", err)
+			log.Println("transport", "grpc", "procedure", "getStream", "msg", "failure", "err", err)
 			return status.Convert(err).Err()
 		}
-		s.logger.Log("transport", "grpc", "procedure", "getStream", "msg", "success")
+		log.Println("transport", "grpc", "procedure", "getStream", "msg", "success")
 	}
 	return nil
 }

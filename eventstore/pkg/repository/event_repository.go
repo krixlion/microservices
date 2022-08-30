@@ -1,20 +1,17 @@
-// Holds EventRepository definition and it's CRUD implementation
 package repository
 
 import (
 	"context"
 	"eventstore/pkg/grpc/pb"
-	"eventstore/pkg/log"
 
-	kitlog "github.com/go-kit/log"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type EventRepository struct {
-	db     *mongo.Database
-	logger kitlog.Logger
+	db *mongo.Database
+	// logger kitlog.Logger
 }
 
 func MakeEventRepository() EventRepository {
@@ -31,8 +28,8 @@ func MakeEventRepository() EventRepository {
 	db := client.Database("eventstore")
 
 	return EventRepository{
-		db:     db,
-		logger: log.MakeLogger(),
+		db: db,
+		// logger: log.MakeLogger(),
 	}
 }
 
