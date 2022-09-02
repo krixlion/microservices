@@ -5,79 +5,53 @@ import (
 	"eventstore/pkg/grpc/pb"
 	"eventstore/pkg/log"
 	"eventstore/pkg/repository"
-	"fmt"
 
-	kitlog "github.com/go-kit/log"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"go.mongodb.org/mongo-driver/mongo"
-	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type EventStoreServer struct {
 	pb.UnimplementedEventStoreServer
-	repo   repository.Repository[*pb.Event]
-	logger kitlog.Logger
+	repo repository.Repository[*pb.Event]
+	// logger kitlog.Logger
 }
 
 func MakeEventStoreServer() EventStoreServer {
 	return EventStoreServer{
-		repo:   repository.MakeEventRepository(),
-		logger: log.MakeLogger(),
+		repo: repository.MakeEventRepository(),
+		// logger: log.MakeLogger(),
 	}
-}
-
-func FmtDupKeyErr(err error) error {
-	logger := log.MakeLogger()
-	badReq := &errdetails.BadRequest{}
-	violation := &errdetails.BadRequest_FieldViolation{
-		Field:       "event_id",
-		Description: err.Error(),
-	}
-	badReq.FieldViolations = append(badReq.FieldViolations, violation)
-
-	st, statusErr := status.New(codes.AlreadyExists, "Event with given ID already exists").WithDetails(badReq)
-	if statusErr != nil {
-		logger.Log("transport", "gRPC", "msg", "Unexpected error attaching metadata", "err", err)
-		panic(fmt.Sprintf("Unexpected error attaching metadata: %v", err))
-	}
-
-	err = st.Err()
-	return err
 }
 
 func (s EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
 	// Save document to DB
 	if err := s.repo.Create(ctx, req.Event); err != nil {
-		if mongo.IsDuplicateKeyError(err) {
-			err = FmtDupKeyErr(err)
-		}
+		log.PrintLn("transport", "grpc", "procedure", "create", "msg", "failure", "err", err)
 		return &pb.CreateEventResponse{
 			IsSuccess: false,
-		}, err
+		}, status.Convert(err).Err()
 	}
-
+	log.PrintLn("transport", "grpc", "procedure", "create", "msg", "success")
 	return &pb.CreateEventResponse{
 		IsSuccess: true,
 	}, nil
 }
 
-func (s EventStoreServer) Get(ctx context.Context, rq *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
-	id := rq.GetEventId()
+func (s EventStoreServer) Get(ctx context.Context, req *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
+	id := req.GetEventId()
 	if id == "" {
 		return nil, status.Error(codes.InvalidArgument, "Invalid ID")
 	}
 	// Get document from DB
 	event, err := s.repo.Get(ctx, id)
-	if event == nil {
+
+	if err != nil {
+		log.PrintLn("transport", "grpc", "procedure", "get", "msg", "failure", "err", err)
 		return nil, status.Error(codes.NotFound, "Event not found")
 	}
-	if err != nil {
-		return nil, err
-	}
 
-	s.logger.Log("transport", "grpc", "msg", "succesfully sent get response")
+	log.PrintLn("transport", "grpc", "procedure", "get", "msg", "success")
 	return &pb.GetEventsResponse{Event: event}, nil
 }
 
@@ -85,7 +59,7 @@ func (s EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventSto
 	ctx := stream.Context()
 	events, err := s.repo.Index(ctx)
 	if err != nil {
-		s.logger.Log("transport", "mongodb", "msg", "failed to retrieve events", "err", err)
+		log.PrintLn("transport", "grpc", "procedure", "getStream", "msg", "failure", "err", err)
 		return status.Convert(err).Err()
 	}
 
@@ -93,15 +67,15 @@ func (s EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventSto
 	for _, event := range events {
 		// If client is unavailable Send() will return an error and abort streaming
 		if err := stream.Send(event); err != nil {
-			s.logger.Log("transport", "grpc", "msg", "stopped streaming events", "err", err)
+			log.PrintLn("transport", "grpc", "procedure", "getStream", "msg", "failure", "err", err)
 			return status.Convert(err).Err()
 		}
-		s.logger.Log("transport", "grpc", "msg", "succesfully sent stream response")
+		log.PrintLn("transport", "grpc", "procedure", "getStream", "msg", "success")
 	}
 	return nil
 }
 
-func (s EventStoreServer) Publish(event *pb.Event) error {
+func (s EventStoreServer) Publish(ctx context.Context, event *pb.Event) error {
 	const uri = "amqp://guest:guest@rabbitmq-service:5672/"
 	rabbitmq, err := amqp.Dial(uri)
 	if err != nil {
@@ -140,7 +114,7 @@ func (s EventStoreServer) Publish(event *pb.Event) error {
 		return err
 	}
 	err = ch.PublishWithContext(
-		context.Background(),
+		ctx,
 		"",     // exchange
 		q.Name, // routing key
 		false,  // mandatory

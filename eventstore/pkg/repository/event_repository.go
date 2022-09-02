@@ -1,20 +1,18 @@
-// Holds EventRepository definition and it's CRUD implementation
 package repository
 
 import (
 	"context"
-	"eventstore/pkg/grpc/pb"
-	"eventstore/pkg/log"
 
-	kitlog "github.com/go-kit/log"
+	"eventstore/pkg/grpc/pb"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type EventRepository struct {
-	db     *mongo.Database
-	logger kitlog.Logger
+	db *mongo.Database
+	// logger kitlog.Logger
 }
 
 func MakeEventRepository() EventRepository {
@@ -31,8 +29,8 @@ func MakeEventRepository() EventRepository {
 	db := client.Database("eventstore")
 
 	return EventRepository{
-		db:     db,
-		logger: log.MakeLogger(),
+		db: db,
+		// logger: log.MakeLogger(),
 	}
 }
 
@@ -47,36 +45,24 @@ func (repo EventRepository) Create(ctx context.Context, event *pb.Event) error {
 	_, err := repo.db.Collection("events").InsertOne(ctx, doc)
 
 	if err != nil {
-		repo.logger.Log("msg", "failed to create event", "err", err)
 		return err
 	}
-	repo.logger.Log("msg", "succesfully created an event")
 	return nil
 }
 
 func (repo EventRepository) Get(ctx context.Context, id string) (*pb.Event, error) {
-	cursor, err := repo.db.Collection("events").Find(ctx, bson.M{"_id": id})
+	var results *pb.Event
+	err := repo.db.Collection("events").FindOne(ctx, bson.M{"_id": id}).Decode(&results)
 	if err != nil {
-		repo.logger.Log("msg", "failed to get event", "err", err)
 		return nil, err
 	}
 
-	var results []*pb.Event
-	// check for errors in the conversion
-	if err = cursor.All(ctx, &results); err != nil {
-		return nil, err
-	}
-
-	if len(results) > 0 {
-		return results[0], nil
-	}
-	return nil, nil
+	return results, nil
 }
 
 func (repo EventRepository) Index(ctx context.Context) ([]*pb.Event, error) {
 	cursor, err := repo.db.Collection("events").Find(ctx, bson.D{})
 	if err != nil {
-		repo.logger.Log("msg", "failed to get event", "err", err)
 		return nil, err
 	}
 

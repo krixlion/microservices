@@ -5,6 +5,5 @@ import (
 )
 
 func main() {
-	// repository.Ping()
 	service.Run()
 }
