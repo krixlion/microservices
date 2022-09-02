@@ -12,16 +12,19 @@ import (
 )
 
 var (
-	port = flag.Int("port", 50051, "The server port")
+	port int
 )
 
-func Run() {
-	logger := log.MakeLogger()
-
+func init() {
+	portFlag := flag.Int("port", 50051, "The server port")
 	flag.Parse()
-	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", *port))
+	port = *portFlag
+}
+
+func Run() {
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", port))
 	if err != nil {
-		logger.Log("transport", "net/tcp", "msg", "failed listening", "err", err)
+		log.PrintLn("transport", "net/tcp", "msg", "failed listening", "err", err)
 	}
 
 	grpcServer := grpc.NewServer()
@@ -29,9 +32,9 @@ func Run() {
 
 	pb.RegisterEventStoreServer(grpcServer, server)
 
-	logger.Log("transport", "net/tcp", "msg", "listening")
+	log.PrintLn("transport", "net/tcp", "msg", "listening")
 	err = grpcServer.Serve(lis)
 	if err != nil {
-		logger.Log("transport", "grpc", "msg", "failed to serve", "err", err)
+		log.PrintLn("transport", "grpc", "msg", "failed to serve", "err", err)
 	}
 }

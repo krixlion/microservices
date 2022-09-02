@@ -27,11 +27,12 @@ func MakeEventStoreServer() EventStoreServer {
 func (s EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
 	// Save document to DB
 	if err := s.repo.Create(ctx, req.Event); err != nil {
+		log.PrintLn("transport", "grpc", "procedure", "create", "msg", "failure", "err", err)
 		return &pb.CreateEventResponse{
 			IsSuccess: false,
 		}, status.Convert(err).Err()
 	}
-	log.Println("transport", "grpc", "procedure", "create", "msg", "success")
+	log.PrintLn("transport", "grpc", "procedure", "create", "msg", "success")
 	return &pb.CreateEventResponse{
 		IsSuccess: true,
 	}, nil
@@ -46,11 +47,11 @@ func (s EventStoreServer) Get(ctx context.Context, req *pb.GetEventsRequest) (*p
 	event, err := s.repo.Get(ctx, id)
 
 	if err != nil {
-		log.Println("transport", "grpc", "procedure", "get", "msg", "failure", "err", err)
+		log.PrintLn("transport", "grpc", "procedure", "get", "msg", "failure", "err", err)
 		return nil, status.Error(codes.NotFound, "Event not found")
 	}
 
-	log.Println("transport", "grpc", "procedure", "get", "msg", "success")
+	log.PrintLn("transport", "grpc", "procedure", "get", "msg", "success")
 	return &pb.GetEventsResponse{Event: event}, nil
 }
 
@@ -58,7 +59,7 @@ func (s EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventSto
 	ctx := stream.Context()
 	events, err := s.repo.Index(ctx)
 	if err != nil {
-		log.Println("transport", "grpc", "procedure", "getStream", "msg", "failure", "err", err)
+		log.PrintLn("transport", "grpc", "procedure", "getStream", "msg", "failure", "err", err)
 		return status.Convert(err).Err()
 	}
 
@@ -66,10 +67,10 @@ func (s EventStoreServer) GetStream(req *pb.GetEventsRequest, stream pb.EventSto
 	for _, event := range events {
 		// If client is unavailable Send() will return an error and abort streaming
 		if err := stream.Send(event); err != nil {
-			log.Println("transport", "grpc", "procedure", "getStream", "msg", "failure", "err", err)
+			log.PrintLn("transport", "grpc", "procedure", "getStream", "msg", "failure", "err", err)
 			return status.Convert(err).Err()
 		}
-		log.Println("transport", "grpc", "procedure", "getStream", "msg", "success")
+		log.PrintLn("transport", "grpc", "procedure", "getStream", "msg", "success")
 	}
 	return nil
 }

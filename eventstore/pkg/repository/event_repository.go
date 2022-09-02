@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"eventstore/pkg/grpc/pb"
 
 	"go.mongodb.org/mongo-driver/bson"

@@ -16,7 +16,7 @@ func MakeLogger() log.Logger {
 	return logger
 }
 
-func Println(keyvals ...interface{}) error {
+func PrintLn(keyvals ...interface{}) error {
 	err := logger.Log(keyvals...)
 	return err
 }

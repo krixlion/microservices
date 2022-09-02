@@ -1,3 +1,4 @@
+// Program used to test connection with DB
 package main
 
 import (
@@ -11,7 +12,6 @@ import (
 )
 
 func Ping(uri string) {
-
 	// Create a new client and connect to the server
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	if err != nil {
@@ -27,7 +27,7 @@ func Ping(uri string) {
 		panic(err)
 	}
 
-	log.Println("transport", "mongodb", "msg", "succesfully pinged and connected to the DB")
+	log.PrintLn("transport", "mongodb", "msg", "succesfully pinged and connected to the DB")
 }
 
 func main() {
