@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	mygrpc "eventstore/pkg/grpc"
 	"eventstore/pkg/grpc/pb"
 	"eventstore/pkg/log"
@@ -29,6 +30,7 @@ func Run() {
 
 	grpcServer := grpc.NewServer()
 	server := mygrpc.MakeEventStoreServer()
+	defer log.PrintLn(server.Close(context.Background()))
 
 	pb.RegisterEventStoreServer(grpcServer, server)
 

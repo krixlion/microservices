@@ -24,6 +24,10 @@ func MakeEventStoreServer() EventStoreServer {
 	}
 }
 
+func (s EventStoreServer) Close(ctx context.Context) error {
+	return s.repo.Close(ctx)
+}
+
 func (s EventStoreServer) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
 	// Save document to DB
 	if err := s.repo.Create(ctx, req.Event); err != nil {
@@ -81,8 +85,8 @@ func (s EventStoreServer) Publish(ctx context.Context, event *pb.Event) error {
 	if err != nil {
 		return err
 	}
-
 	defer rabbitmq.Close()
+
 	ch, err := rabbitmq.Channel()
 	if err != nil {
 		return err

@@ -34,6 +34,10 @@ func MakeEventRepository() EventRepository {
 	}
 }
 
+func (repo EventRepository) Close(ctx context.Context) error {
+	return repo.db.Client().Disconnect(ctx)
+}
+
 func (repo EventRepository) Create(ctx context.Context, event *pb.Event) error {
 	doc := bson.D{
 		{"event_type", event.GetEventType()},

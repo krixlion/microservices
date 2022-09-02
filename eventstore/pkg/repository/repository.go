@@ -7,4 +7,6 @@ type Repository[T any] interface {
 	Create(context.Context, T) error
 	Get(context.Context, string) (T, error)
 	Index(context.Context) ([]T, error)
+
+	Close(context.Context) error
 }
