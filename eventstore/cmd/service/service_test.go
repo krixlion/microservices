@@ -2,8 +2,8 @@ package service_test
 
 import (
 	"context"
-	mygrpc "eventstore/pkg/grpc"
-	"eventstore/pkg/grpc/pb"
+	"eventstore/internal/pb"
+	"eventstore/internal/pkg/server"
 	"log"
 	"net"
 	"testing"
@@ -19,9 +19,11 @@ const bufSize = 1024 * 1024
 var lis *bufconn.Listener
 
 func init() {
+	// bufconn allows the server to call itself
+	// great for testing across whole infrastructure
 	lis = bufconn.Listen(bufSize)
 	s := grpc.NewServer()
-	eventstore := mygrpc.MakeEventStoreServer()
+	eventstore := server.MakeEventStoreServer()
 	pb.RegisterEventStoreServer(s, eventstore)
 	go func() {
 		if err := s.Serve(lis); err != nil {
@@ -52,7 +54,7 @@ func TestCreateAndGet(t *testing.T) {
 		AggregateId:   "user",
 		AggregateType: "service",
 		EventData:     "name: imie",
-		ChannelName:   "user",
+		// ChannelName:   "user",
 	}
 	createResponse, err := client.Create(ctx, &pb.CreateEventRequest{
 		Event: event,

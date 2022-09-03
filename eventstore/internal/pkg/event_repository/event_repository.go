@@ -1,13 +1,18 @@
-package repository
+package event_repository
 
 import (
 	"context"
 
-	"eventstore/pkg/grpc/pb"
+	"eventstore/internal/pb"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+const (
+	dbName = "eventstore"
+	dbUri  = "mongodb://admin:admin123@eventstore-db-service:27017"
 )
 
 type EventRepository struct {
@@ -16,9 +21,8 @@ type EventRepository struct {
 }
 
 func MakeEventRepository() EventRepository {
-	uri := "mongodb://admin:admin123@eventstore-db-service:27017"
 	reg := bson.NewRegistryBuilder().Build()
-	client_opts := options.Client().ApplyURI(uri).SetRegistry(reg)
+	client_opts := options.Client().ApplyURI(dbUri).SetRegistry(reg)
 
 	client, err := mongo.Connect(context.Background(), client_opts)
 
@@ -26,7 +30,7 @@ func MakeEventRepository() EventRepository {
 		panic(err)
 	}
 
-	db := client.Database("eventstore")
+	db := client.Database(dbName)
 
 	return EventRepository{
 		db: db,
@@ -44,7 +48,7 @@ func (repo EventRepository) Create(ctx context.Context, event *pb.Event) error {
 		{"aggregate_id", event.GetAggregateId()},
 		{"aggregate_type", event.GetAggregateType()},
 		{"event_data", event.GetEventData()},
-		{"channel_name", event.GetChannelName()},
+		// {"channel_name", event.GetChannelName()},
 	}
 	_, err := repo.db.Collection("events").InsertOne(ctx, doc)
 

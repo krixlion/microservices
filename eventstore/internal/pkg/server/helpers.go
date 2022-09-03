@@ -1,4 +1,4 @@
-package grpc
+package server
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func FmtDupKeyErr(err error) error {
+func fmtDupKeyErr(err error) error {
 	badReq := &errdetails.BadRequest{}
 	violation := &errdetails.BadRequest_FieldViolation{
 		Field:       "event_id",

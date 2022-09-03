@@ -2,9 +2,10 @@ package service
 
 import (
 	"context"
-	mygrpc "eventstore/pkg/grpc"
-	"eventstore/pkg/grpc/pb"
+	"eventstore/internal/pb"
+	"eventstore/internal/pkg/server"
 	"eventstore/pkg/log"
+
 	"flag"
 	"fmt"
 	"net"
@@ -29,10 +30,16 @@ func Run() {
 	}
 
 	grpcServer := grpc.NewServer()
-	server := mygrpc.MakeEventStoreServer()
-	defer log.PrintLn(server.Close(context.Background()))
+	eventstore := server.MakeEventStoreServer()
 
-	pb.RegisterEventStoreServer(grpcServer, server)
+	defer func() {
+		err := eventstore.Close(context.Background())
+		if err != nil {
+			log.PrintLn("msg", "failed to gracefully close connections", "err", err)
+		}
+	}()
+
+	pb.RegisterEventStoreServer(grpcServer, eventstore)
 
 	log.PrintLn("transport", "net/tcp", "msg", "listening")
 	err = grpcServer.Serve(lis)

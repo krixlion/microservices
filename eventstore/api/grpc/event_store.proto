@@ -16,7 +16,7 @@ message Event {
     string aggregate_id = 3; // @gotags: bson:"aggregate_id,omitempty"
     string aggregate_type = 4; // @gotags: bson:"aggregate_type,omitempty"
     string event_data = 5; // @gotags: bson:"event_data,omitempty"
-    string channel_name = 6; // an optional field
+    // string channel_name = 6; // an optional field
 }
 
 message CreateEventRequest {

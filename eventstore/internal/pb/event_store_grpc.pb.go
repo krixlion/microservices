@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.6.1
-// source: pkg/grpc/pb/event_store.proto
+// source: event_store.proto
 
 package pb
 
@@ -201,5 +201,5 @@ var EventStore_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "pkg/grpc/pb/event_store.proto",
+	Metadata: "event_store.proto",
 }

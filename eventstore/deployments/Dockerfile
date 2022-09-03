@@ -7,7 +7,7 @@ ENV APP_HOME /go/src/eventstore
 RUN mkdir -p "$APP_HOME"
 WORKDIR "$APP_HOME"
 
-ADD . .
+ADD ../. .
 
 RUN go mod tidy
 RUN go mod vendor
