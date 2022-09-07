@@ -3,3 +3,4 @@
 vendor
 # *.sum
 *-archive*
+.env

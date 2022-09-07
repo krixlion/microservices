@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/go-kit/log v0.2.1
+	github.com/joho/godotenv v1.4.0
 	github.com/matryer/is v1.4.0
 	github.com/rabbitmq/amqp091-go v1.4.0
 	go.mongodb.org/mongo-driver v1.10.1
