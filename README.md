@@ -1,6 +1,3 @@
-# Disclaimer
-**This repo was made as an exercise and should _not_ be used in _production_ environment.**
-
 ## Project description
 *My attempt at creating microservices entirely written in Go*
 
