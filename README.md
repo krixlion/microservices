@@ -1,3 +1,6 @@
+## Project status
+Project is currently closed and will be used as a reference during development of another microservice project I plan to begin working on soon.
+
 ## Project description
 *My attempt at creating microservices entirely written in Go*
 
