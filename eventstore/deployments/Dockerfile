@@ -11,6 +11,6 @@ ADD ../. .
 
 RUN go mod tidy
 RUN go mod vendor
-RUN go build cmd/main.go
+RUN go build cmd/main.go -o eventstore
 EXPOSE 50051
-CMD [ "./main" ]
+CMD [ "./eventstore" ]

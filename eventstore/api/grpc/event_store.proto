@@ -11,7 +11,7 @@ service EventStore {
 } 
 
 message Event {
-    string event_id = 1;// @gotags: bson:"_id,omitempty"
+    string event_id = 1; // @gotags: bson:"_id,omitempty"
     string event_type = 2; // @gotags: bson:"event_type,omitempty"
     string aggregate_id = 3; // @gotags: bson:"aggregate_id,omitempty"
     string aggregate_type = 4; // @gotags: bson:"aggregate_type,omitempty"
